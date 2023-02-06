@@ -1,0 +1,26 @@
+{
+  "name": "interactive-information-visualization",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Compaagnie/interactive-information-visualization.git"
+  },
+  "keywords": [
+    "info",
+    "viz"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Compaagnie/interactive-information-visualization/issues"
+  },
+  "homepage": "https://github.com/Compaagnie/interactive-information-visualization#readme",
+  "dependencies": {
+    "bootstrap": "^5.3.0-alpha1"
+  }
+}
