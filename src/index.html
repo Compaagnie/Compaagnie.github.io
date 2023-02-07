@@ -1,10 +1,27 @@
 <!doctype html>
 <html lang="en">
-  <head>
+  <!-- <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bootstrap w/ Vite</title>
-  </head>
+  </head> -->
+  <div class="container">
+    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+        <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"/></svg>
+        <span class="fs-4">Simple header</span>
+      </a>
+
+      <ul class="nav nav-pills">
+        <li class="nav-item"><a href="#" class="nav-link active" aria-current="page">Home</a></li>
+        <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
+        <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li>
+        <li class="nav-item"><a href="#" class="nav-link">FAQs</a></li>
+        <li class="nav-item"><a href="#" class="nav-link">About</a></li>
+      </ul>
+    </header>
+  </div>
+
   <body>
     <div class="container py-4 px-3 mx-auto">
       <h1>Hello, Bootstrap and Vite!</h1>
@@ -12,4 +29,15 @@
     </div>
     <script type="module" src="./js/main.js"></script>
   </body>
+
+  <div class="container">
+    <footer class="py-3 my-4">
+        <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+        <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Julien Berry</a></li>
+        <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Noemie Hanus</a></li>
+        <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Nicolas Graveret</a></li>
+        </ul>
+        <p class="text-center text-muted">&copy; 2023, Up-Wave</p>
+    </footer>
+  </div>
 </html>
