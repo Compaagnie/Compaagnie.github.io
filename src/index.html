@@ -11,17 +11,18 @@
         <h1>France's Water Resources</h1>
       </div>
       <script type="module" src="./js/main.js"></script>
+      <script type="text/javascript" src="./js/main.js"></script>
       <div id="main">
         <div id="map">
           <h2>Map</h2>
           <div class="col">
             <div class="row">
-              <button class="btn btn-primary">Map1</button>
-              <button class="btn btn-primary">Map2</button>
+              <button class="btn btn-primary map-btn" onclick="setFocus(1)">Map1</button>
+              <button class="btn btn-primary map-btn" onclick="setFocus(2)">Map2</button>
             </div>
             <div class="row">
-              <button class="btn btn-primary">Map3</button>
-              <button class="btn btn-primary">Map4</button>
+              <button class="btn btn-primary map-btn" onclick="setFocus(3)">Map3</button>
+              <button class="btn btn-primary map-btn" onclick="setFocus(4)">Map4</button>
             </div>
           </div>
         </div>
@@ -30,7 +31,7 @@
             <h2>Legende</h2>
             <div class="col">
               <div class="row">
-                <button class="btn btn-primary">Legend</button>
+                <button class="btn btn-primary" onclick="toggleAllMapButtons()">Legend</button>
               </div>
               <div class="row">
                 <button class="btn btn-primary">Pollutants</button>
