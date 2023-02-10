@@ -11619,7 +11619,7 @@ textarea.form-control-lg {
 #header {
   background: #6096B4;
   text-align: center;
-  padding: 20px;
+  padding: 10px;
 }
 
 #description {
@@ -11627,7 +11627,7 @@ textarea.form-control-lg {
 }
 
 #main {
-  padding: 20px;
+  padding: 10px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
 }
@@ -11636,6 +11636,7 @@ textarea.form-control-lg {
   grid-column: 1/2;
   padding: 10px;
   text-align: center;
+  border: solid #000;
 }
 
 #main-right {
