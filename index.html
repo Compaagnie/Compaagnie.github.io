@@ -18,8 +18,9 @@
         This visualization is for local inhabitants that wants to check the quality of water next to where they live. Afterall, it's important to drink clean water that won't endanger your health
       </div>
       
-      <script type="text/javascript" src="js/d3.v5.min.js"></script>
       <script type="module" src="./js/main.js"></script>
+      <script type="text/javascript" src="js/d3.v5.min.js"></script>
+      <script type="text/javascript" src="js/interaction.js"></script>
       <!-- <script type="text/javascript" src="./js/interactions.js"></script> -->
 
       <div id="main">
@@ -52,15 +53,15 @@
           <div id="risk">
             <h3>Risks</h3>
             <div>
-              <input type="checkbox" id="scales" name="risk1" checked>
+              <input type="checkbox" id="scales" onchange="toggleMapButton(1)" name="risk1" checked>
               <label for="risk1">Risk 1</label>
             </div>
             <div>
-              <input type="checkbox" id="scales" name="risk2" checked>
+              <input type="checkbox" id="scales" onchange="toggleMapButton(2)" name="risk2" checked>
               <label for="risk2">Risk 2</label>
             </div>
             <div>
-              <input type="checkbox" id="scales" name="risk3" checked>
+              <input type="checkbox" id="scales" onchange="toggleMapButton(3)" name="risk3" checked>
               <label for="risk1">Risk 3</label>
             </div>
           </div>

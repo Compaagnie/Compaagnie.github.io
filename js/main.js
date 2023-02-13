@@ -13,6 +13,7 @@ const createMap = function (){
         
     var group = svg.append("g");
     group.append("image")
+        .attr("id", "risk1")
         .attr("x", 0)
         .attr("y", 0)
         .attr("width", sizeX)
@@ -28,17 +29,19 @@ const createMap = function (){
     //     .attr("fill", "none")
     
     group.append("circle")
+        .attr("id", "risk2")
         .attr("cx", 290)
         .attr("cy", 172)
         .attr("r", 30)
-        .attr("fill", "Lightblue")
+        .style("fill", "Lightblue")
         .on("click", function(){setFocus(2)});
     
     group.append("circle")
+        .attr("id", "risk3")
         .attr("cx", 337)
         .attr("cy", 300)
         .attr("r", 44)
-        .attr("fill", "Blue")
+        .style("fill", "Blue")
         .on("click", function(){setFocus(3)});
 }
 
@@ -46,17 +49,11 @@ createMap();
 
 function setFocus(map_id)
 {
-    document.getElementById('focus').innerHTML = '<h2> Focus on map ' + map_id + '</h2>';
+    if (button[map_id-1]) {
+        document.getElementById('focus').innerHTML = '<h2> Focus on map ' + map_id + '</h2>';
+        
+    }
 }
 
 setFocus(1);
 
-function toggleAllMapButtons()
-{
-    for(var btn of document.getElementsByClassName('map-btn'))
-    {
-        var is_disabled = btn.classList.contains('disabled');
-        if(is_disabled) btn.classList.remove('disabled');
-        else btn.classList.add('disabled');
-    }
-}
