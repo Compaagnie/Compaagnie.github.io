@@ -2,7 +2,6 @@ const sizeX = 400;
 const sizeY = 379;
 
 const createMap = function (){
-
     var svg = d3.select("#map")
         .append("svg")
     
@@ -45,7 +44,40 @@ const createMap = function (){
         .on("click", function(){setFocus(3)});
 }
 
+const createLegende = function(){
+    var svg = d3.select("#legende")
+        .append("svg")
+    
+    svg.attr("width", 100)
+        .attr("height", 50)
+        .classed("centered", true);
+    
+        
+    var group = svg.append("g");
+    group.append("rect")
+        .attr("x", 10)
+        .attr("y", 10)
+        .attr("width", 20)
+        .attr("height", 10)
+        .style("fill", "Lightblue");
+    group.append("text")
+        .attr("x", 35)
+        .attr("y", 15)
+        .text("Risk2")
+
+    group.append("rect")
+        .attr("x", 10)
+        .attr("y", 30)
+        .attr("width", 20)
+        .attr("height", 10)
+        .style("fill", "Blue");
+    group.append("text")
+        .attr("x", 35)
+        .attr("y", 35)
+        .text("Risk3")
+}
 createMap();
+createLegende();
 
 function setFocus(map_id)
 {
