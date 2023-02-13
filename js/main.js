@@ -62,7 +62,7 @@ const createLegende = function(){
         .style("fill", "Lightblue");
     group.append("text")
         .attr("x", 35)
-        .attr("y", 15)
+        .attr("y", 20)
         .text("Risk2")
 
     group.append("rect")
@@ -73,7 +73,7 @@ const createLegende = function(){
         .style("fill", "Blue");
     group.append("text")
         .attr("x", 35)
-        .attr("y", 35)
+        .attr("y", 40)
         .text("Risk3")
 }
 createMap();
