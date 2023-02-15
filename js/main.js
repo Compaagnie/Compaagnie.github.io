@@ -16,40 +16,40 @@ var svg = d3.select("#my_dataviz")
           "translate(" + margin.left + "," + margin.top + ")");
 
 // Parse the Data
-// d3.csv("data/Pollutants.csv", function(data) {
+d3.csv("data/Pollutants.csv", function(data) {
 
 
-// // X axis
-// var x = d3.scaleBand()
-//   .range([ 0, width ])
-//   .domain(data.map(function(d) { return d.gwPollutantCode; }))
-//   .padding(0.2);
-// svg.append("g")
-//   .attr("transform", "translate(0," + height + ")")
-//   .call(d3.axisBottom(x))
-//   .selectAll("text")
-//     .attr("transform", "translate(-10,0)rotate(-45)")
-//     .style("text-anchor", "end");
+// X axis
+var x = d3.scaleBand()
+  .range([ 0, width ])
+  .domain(data.map(function(d) { return d.gwPollutantCode; }))
+  .padding(0.2);
+svg.append("g")
+  .attr("transform", "translate(0," + height + ")")
+  .call(d3.axisBottom(x))
+  .selectAll("text")
+    .attr("transform", "translate(-10,0)rotate(-45)")
+    .style("text-anchor", "end");
 
-// // Add Y axis
-// var y = d3.scaleLinear()
-//   .domain([0, 13000])
-//   .range([ height, 0]);
-// svg.append("g")
-//   .call(d3.axisLeft(y));
+// Add Y axis
+var y = d3.scaleLinear()
+  .domain([0, 13000])
+  .range([ height, 0]);
+svg.append("g")
+  .call(d3.axisLeft(y));
 
-// // Bars
-// svg.selectAll("mybar")
-//   .data(data)
-//   .enter()
-//   .append("rect")
-//     .attr("x", function(d) { return x(d.gwPollutantCode); })
-//     .attr("y", function(d) { return y(d.Value); })
-//     .attr("width", x.bandwidth())
-//     .attr("height", function(d) { return height - y(d.Value); })
-//     .attr("fill", "#69b3a2")
+// Bars
+svg.selectAll("mybar")
+  .data(data)
+  .enter()
+  .append("rect")
+    .attr("x", function(d) { return x(d.gwPollutantCode); })
+    .attr("y", function(d) { return y(d.Value); })
+    .attr("width", x.bandwidth())
+    .attr("height", function(d) { return height - y(d.Value); })
+    .attr("fill", "#69b3a2")
 
-// })
+})
 
 // const createMap = function (){
 //     var svg = d3.select("#map")
@@ -158,7 +158,7 @@ d3.csv("../data/Waterbase_v2021_1_T_WISE6_AggregatedDataByWaterBody.csv").then(f
         z: d => d.waterBodyIdentifier,
         
         yLabel: "↑ Population (millions)",
-        zDomain: waterBodyIdentifier,
+        //zDomain: waterBodyIdentifier,
         colors: d3.schemeSpectral[pollutants.length],
         
         height: 500
@@ -270,7 +270,7 @@ function StackedBarChart(data, {
     .selectAll("g")
     .data(series)
     .join("g")
-        .attr("fill", "#000000")
+        .attr("fill", "#([{i}]) => color(Z[i])")
       .selectAll("rect")
       .data(d => d)
       .join("rect")
@@ -283,7 +283,7 @@ function StackedBarChart(data, {
         .text(({i}) => title(i));
   
      svg.append("g")
-         .attr("transform", `translate(0,${400})`)
+         .attr("transform", `translate(0,${yScale(0)})`)
          .call(xAxis);
     console.log(Object.assign(svg.node(), {scales: {color}}));
     return Object.assign(svg.node(), {scales: {color}});
