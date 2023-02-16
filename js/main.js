@@ -6,51 +6,6 @@ var margin = {top: 30, right: 30, bottom: 70, left: 60},
     width = 460 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
 
-// append the svg object to the body of the page
-var svg = d3.select("#my_dataviz")
-  .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
-
-// Parse the Data
-d3.csv("data/Pollutants.csv", function(data) {
-
-
-// X axis
-var x = d3.scaleBand()
-  .range([ 0, width ])
-  .domain(data.map(function(d) { return d.gwPollutantCode; }))
-  .padding(0.2);
-svg.append("g")
-  .attr("transform", "translate(0," + height + ")")
-  .call(d3.axisBottom(x))
-  .selectAll("text")
-    .attr("transform", "translate(-10,0)rotate(-45)")
-    .style("text-anchor", "end");
-
-// Add Y axis
-var y = d3.scaleLinear()
-  .domain([0, 13000])
-  .range([ height, 0]);
-svg.append("g")
-  .call(d3.axisLeft(y));
-
-// Bars
-svg.selectAll("mybar")
-  .data(data)
-  .enter()
-  .append("rect")
-    .attr("x", function(d) { return x(d.gwPollutantCode); })
-    .attr("y", function(d) { return y(d.Value); })
-    .attr("width", x.bandwidth())
-    .attr("height", function(d) { return height - y(d.Value); })
-    .attr("fill", "#69b3a2")
-
-})
-
 // const createMap = function (){
 //     var svg = d3.select("#map")
 //         .append("svg")
@@ -133,7 +88,6 @@ function setFocus(map_id)
 {
     if (button[map_id-1]) {
         document.getElementById('focus').innerHTML = '<h2> Focus on map ' + map_id + '</h2>';
-        
     }
 }
 
@@ -142,34 +96,39 @@ setFocus(1);
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 var waterBodies;
+var filtered;
+var scaleFix;
 var pollutants;
 var waterBodyIdentifier;
 var chart;
-d3.csv("../data/T_WISE6_AggregatedData_FR.csv").then(function(data){
-    waterBodies = data//.filter(function(d,i){ return i<10 });
-    pollutants = d3.group(waterBodies, function(d){return(d.observedPropertyDeterminandLabel)});
-    waterBodyIdentifier = d3.group(waterBodies, function(d){return(d.monitoringSiteIdentifier)});
-    console.log(waterBodies);
-    console.log(pollutants);
-    console.log(waterBodyIdentifier);
-    chart = StackedBarChart(waterBodies, {
-        x: d => d.observedPropertyDeterminandLabel,
-        y: d => d.resultMeanValue,
-        z: d => d.monitoringSiteIdentifier,
-        
-        yLabel: "↑ Population (millions)",
-        //zDomain: waterBodyIdentifier,
-        colors: d3.schemeSpectral[pollutants.length],
-        width:1000,
-        height: 500
-    })
-    console.log(chart)
-    document.getElementById("test").append(chart)
-});
+var createChart = function(){
+  d3.csv("../data/T_WISE6_AggregatedData_FR.csv").then(function(data){
+      waterBodies = data//.filter(function(d,i){ return i<10 });
+      filtered = waterBodies.filter(function(d){ return  !(d.observedPropertyDeterminandLabel == "pH" || d.observedPropertyDeterminandLabel == "Oxygen saturation" || d.observedPropertyDeterminandLabel == "Water temperature" || d.observedPropertyDeterminandLabel == "Hardness" || d.observedPropertyDeterminandLabel == "Hydrogen Carbonate (Bicarbonate) HCO3") })
+      scaleFix = filtered.map(function(d){ 
+        if (d.resultUom == "ug/L") {
+          d.resultMeanValue = d.resultMeanValue/1000;
+        }
+        return d;
+      })
+      pollutants = d3.group(waterBodies, function(d){return(d.observedPropertyDeterminandLabel)});
+      waterBodyIdentifier = d3.group(waterBodies, function(d){return(d.monitoringSiteIdentifier)});
+      chart = StackedBarChart(scaleFix, {
+          x: d => d.observedPropertyDeterminandLabel,
+          y: d => d.resultMeanValue,
+          z: d => d.monitoringSiteIdentifier,
+          xDomain: d3.groupSort(scaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel),
+          yLabel: "↑ Population (millions)",
+          //zDomain: waterBodyIdentifier,
+          colors: d3.schemeSpectral[pollutants.length],
+          width: 1500,
+          height: 500
+      })
+      document.getElementById("focus").append(chart)
+  });
+}
 
-
-
-
+createChart();
 
 // d3.select("#test").append(chart);
 // Copyright 2021 Observable, Inc.
@@ -287,7 +246,9 @@ function StackedBarChart(data, {
          .call(xAxis);
     console.log(Object.assign(svg.node(), {scales: {color}}));
     return Object.assign(svg.node(), {scales: {color}});
-  }
+}
+
+
 const widthMap = 550, heightMap = 550;
 const path = d3.geoPath();
 const projection = d3.geoConicConformal()
