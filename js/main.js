@@ -86,7 +86,7 @@ var createChart = function(){
   });
 }
 
-createChart();
+//createChart();
 
 // d3.select("#test").append(chart);
 // Copyright 2021 Observable, Inc.
@@ -276,23 +276,23 @@ function BubbleMap(data){
         .attr("stroke-width", 3)
         .attr("fill-opacity", .4)
 
-  var height = 460
-  var width = 460
+  var height = 100
+  var width = 100
   var svgLeg = d3.select("#map")
-    .append("svgLeg")
+    .append("svg")
       .attr("width", width)
       .attr("height", height)
 
   // The scale you use for bubble size
   var size = d3.scaleSqrt()
-    .domain([1, 100])  // What's in the data, let's say it is percentage
+    .domain([0, 1500])  // What's in the data, let's say it is percentage
     .range([1, 100])  // Size in pixel
 
   // Add legend: circles
   var valuesToShow = [10, 50, 100]
-  var xCircle = 130
-  var xLabel = 130
-  var yCircle = 130
+  var xCircle = 30
+  var xLabel = 70
+  var yCircle = 70
   svgLeg
     .selectAll("legend")
     .data(valuesToShow)
@@ -301,8 +301,8 @@ function BubbleMap(data){
       .attr("cx", xCircle)
       .attr("cy", d => yCircle - size(d))
       .attr("r", d => size(d))
-      .style("fill", "red")
-      .attr("stroke", "red")
+      .style("fill", "none")
+      .attr("stroke", "black")
 
   // Add legend: segments
   svgLeg
