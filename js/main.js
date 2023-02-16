@@ -145,22 +145,22 @@ var waterBodies;
 var pollutants;
 var waterBodyIdentifier;
 var chart;
-d3.csv("../data/Waterbase_v2021_1_T_WISE6_AggregatedDataByWaterBody.csv").then(function(data){
+d3.csv("../data/T_WISE6_AggregatedData_FR.csv").then(function(data){
     waterBodies = data//.filter(function(d,i){ return i<10 });
     pollutants = d3.group(waterBodies, function(d){return(d.observedPropertyDeterminandLabel)});
-    waterBodyIdentifier = d3.group(waterBodies, function(d){return(d.waterBodyIdentifier)});
+    waterBodyIdentifier = d3.group(waterBodies, function(d){return(d.monitoringSiteIdentifier)});
     console.log(waterBodies);
     console.log(pollutants);
     console.log(waterBodyIdentifier);
     chart = StackedBarChart(waterBodies, {
         x: d => d.observedPropertyDeterminandLabel,
         y: d => d.resultMeanValue,
-        z: d => d.waterBodyIdentifier,
+        z: d => d.monitoringSiteIdentifier,
         
         yLabel: "↑ Population (millions)",
         //zDomain: waterBodyIdentifier,
         colors: d3.schemeSpectral[pollutants.length],
-        
+        width:1000,
         height: 500
     })
     console.log(chart)
