@@ -15,84 +15,7 @@ var svg = d3.select("#my_dataviz")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
-// Parse the Data
-d3.csv("data/Pollutants.csv", function(data) {
 
-
-// X axis
-var x = d3.scaleBand()
-  .range([ 0, width ])
-  .domain(data.map(function(d) { return d.gwPollutantCode; }))
-  .padding(0.2);
-svg.append("g")
-  .attr("transform", "translate(0," + height + ")")
-  .call(d3.axisBottom(x))
-  .selectAll("text")
-    .attr("transform", "translate(-10,0)rotate(-45)")
-    .style("text-anchor", "end");
-
-// Add Y axis
-var y = d3.scaleLinear()
-  .domain([0, 13000])
-  .range([ height, 0]);
-svg.append("g")
-  .call(d3.axisLeft(y));
-
-// Bars
-svg.selectAll("mybar")
-  .data(data)
-  .enter()
-  .append("rect")
-    .attr("x", function(d) { return x(d.gwPollutantCode); })
-    .attr("y", function(d) { return y(d.Value); })
-    .attr("width", x.bandwidth())
-    .attr("height", function(d) { return height - y(d.Value); })
-    .attr("fill", "#69b3a2")
-
-})
-
-// const createMap = function (){
-//     var svg = d3.select("#map")
-//         .append("svg")
-    
-//     svg.attr("width", sizeX)
-//         .attr("height", sizeY)
-//         .classed("centered", true);
-    
-        
-//     var group = svg.append("g");
-//     group.append("image")
-//         .attr("id", "risk1")
-//         .attr("x", 0)
-//         .attr("y", 0)
-//         .attr("width", sizeX)
-//         .attr("height", sizeY)
-//         .attr("href", "workplace.png")
-//         .on("click", function(){setFocus(1)});
-
-//     // group.append("rect")
-//     //     .attr("x", 0)
-//     //     .attr("y", 0)
-//     //     .attr("width", sizeX)
-//     //     .attr("height", sizeY)
-//     //     .attr("fill", "none")
-    
-//     group.append("circle")
-//         .attr("id", "risk2")
-//         .attr("cx", 290)
-//         .attr("cy", 172)
-//         .attr("r", 30)
-//         .style("fill", "Lightblue")
-//         .on("click", function(){setFocus(2)});
-    
-//     group.append("circle")
-//         .attr("id", "risk3")
-//         .attr("cx", 337)
-//         .attr("cy", 300)
-//         .attr("r", 44)
-//         .style("fill", "Blue")
-//         .on("click", function(){setFocus(3)});
-// }
 
 const createLegende = function(){
     var svg = d3.select("#legende")
@@ -126,7 +49,6 @@ const createLegende = function(){
         .attr("y", 40)
         .text("Risk3")
 }
-//createMap();
 createLegende();
 
 function setFocus(map_id)
@@ -149,9 +71,9 @@ d3.csv("../data/Waterbase_v2021_1_T_WISE6_AggregatedDataByWaterBody.csv").then(f
     waterBodies = data//.filter(function(d,i){ return i<10 });
     pollutants = d3.group(waterBodies, function(d){return(d.observedPropertyDeterminandLabel)});
     waterBodyIdentifier = d3.group(waterBodies, function(d){return(d.waterBodyIdentifier)});
-    console.log(waterBodies);
-    console.log(pollutants);
-    console.log(waterBodyIdentifier);
+    //console.log(waterBodies);
+    //console.log(pollutants);
+    //console.log(waterBodyIdentifier);
     chart = StackedBarChart(waterBodies, {
         x: d => d.observedPropertyDeterminandLabel,
         y: d => d.resultMeanValue,
@@ -163,7 +85,7 @@ d3.csv("../data/Waterbase_v2021_1_T_WISE6_AggregatedDataByWaterBody.csv").then(f
         
         height: 500
     })
-    console.log(chart)
+    //console.log(chart)
     document.getElementById("test").append(chart)
 });
 
@@ -227,7 +149,7 @@ function StackedBarChart(data, {
   
     // Compute the default y-domain. Note: diverging stacks can be negative.
     if (yDomain === undefined) yDomain = d3.extent(series.flat(2));
-    console.log(yDomain);
+    //console.log(yDomain);
   
     // Construct scales, axes, and formats.
     const xScale = d3.scaleBand(xDomain, xRange).paddingInner(xPadding);
@@ -285,9 +207,11 @@ function StackedBarChart(data, {
      svg.append("g")
          .attr("transform", `translate(0,${yScale(0)})`)
          .call(xAxis);
-    console.log(Object.assign(svg.node(), {scales: {color}}));
+    //console.log(Object.assign(svg.node(), {scales: {color}}));
     return Object.assign(svg.node(), {scales: {color}});
   }
+
+
 const widthMap = 550, heightMap = 550;
 const path = d3.geoPath();
 const projection = d3.geoConicConformal()
@@ -327,17 +251,12 @@ d3.csv("data/PosArea.csv", d => {
 }).then(data => {
   // sort the data by body of water and longitude so we don't get empty lon/lat
   data = data.sort((a, b) => d3.ascending(a.idBW, b.idBW) || d3.ascending(a.lon, b.lon));
-
-  
-
-
-  //data.features = data.features.filter( function(d){return d.properties.name=="France"} )
   // remove duplicate water body
   const uniqueBW = [...new Map(data.map((m) => [m.idBW, m])).values()];
   var dataBW = uniqueBW.filter(function(d) { return d.lon != "" && d.lat != "" && d.area != "" && d.area != " "});
 
   //data = uniqueBW.map(getArea);
-  console.log(dataBW);
+  //console.log(dataBW);
 
   var chart = BubbleMap(uniqueBW);
 
@@ -361,4 +280,59 @@ function BubbleMap(data){
         .attr("r", function(d){ return size(d.area) })
         .attr("stroke-width", 3)
         .attr("fill-opacity", .4)
+
+  var height = 460
+  var width = 460
+  var svgLeg = d3.select("#map")
+    .append("svgLeg")
+      .attr("width", width)
+      .attr("height", height)
+
+  // The scale you use for bubble size
+  var size = d3.scaleSqrt()
+    .domain([1, 100])  // What's in the data, let's say it is percentage
+    .range([1, 100])  // Size in pixel
+
+  // Add legend: circles
+  var valuesToShow = [10, 50, 100]
+  var xCircle = 130
+  var xLabel = 130
+  var yCircle = 130
+  svgLeg
+    .selectAll("legend")
+    .data(valuesToShow)
+    .enter()
+    .append("circle")
+      .attr("cx", xCircle)
+      .attr("cy", d => yCircle - size(d))
+      .attr("r", d => size(d))
+      .style("fill", "red")
+      .attr("stroke", "red")
+
+  // Add legend: segments
+  svgLeg
+    .selectAll("legend")
+    .data(valuesToShow)
+    .enter()
+    .append("line")
+      .attr('x1', d => xCircle + size(d) )
+      .attr('x2', xLabel)
+      .attr('y1', d => yCircle - size(d) )
+      .attr('y2', d => yCircle - size(d) )
+      .attr('stroke', 'black')
+      .style('stroke-dasharray', ('2,2'))
+
+  // Add legend: labels
+  svgLeg
+    .selectAll("legend")
+    .data(valuesToShow)
+    .enter()
+    .append("text")
+      .attr('x', xLabel)
+      .attr('y', d => yCircle - size(d) )
+      .text( d => d )
+      .style("font-size", 10)
+      .attr('alignment-baseline', 'middle')
+
+  console.log(svgLeg);
 }
