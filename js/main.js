@@ -47,7 +47,7 @@ var createChart = function(){
       //zDomain: waterBodyIdentifier,
       colors: d3.schemeSpectral[totalByProperty.length],
       width: 1500,
-      height: 500
+      height: 1500
     });
     document.getElementById(placeForBarChart).append(barChart);
   }
@@ -65,7 +65,7 @@ function StackedBarChart(data, {
     title, // given d in data, returns the title text
     marginTop = 30, // top margin, in pixels
     marginRight = 0, // right margin, in pixels
-    marginBottom = 30, // bottom margin, in pixels
+    marginBottom = 200, // bottom margin, in pixels
     marginLeft = 40, // left margin, in pixels
     width = 640, // outer width, in pixels
     height = 400, // outer height, in pixels
