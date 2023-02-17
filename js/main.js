@@ -82,6 +82,8 @@ function StackedBarChart(data, {
     yLabel, // a label for the y-axis
     colors = d3.schemeTableau10, // array of colors
   } = {}) {
+    const margins = {top: 10, right: 30, bottom: 80, left: 20};
+
     // Compute values.
     const X = d3.map(data, x);
     const Y = d3.map(data, y);
@@ -165,9 +167,15 @@ function StackedBarChart(data, {
     if (title) bar.append("title")
         .text(({i}) => title(i));
   
-     svg.append("g")
-         .attr("transform", `translate(0,${yScale(0)})`)
-         .call(xAxis);
+    const xGroup = svg.append("g")
+      .attr("transform", `translate(0,${yScale(0)})`)
+      .call(xAxis);
+
+    xGroup.selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", ".15em")
+      .attr("transform", "rotate(-65)");
     //console.log(Object.assign(svg.node(), {scales: {color}}));
     return Object.assign(svg.node(), {scales: {color}});
 }
