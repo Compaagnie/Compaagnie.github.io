@@ -1,3 +1,5 @@
+const placeForBarChart = "test";
+
 const sizeX = 400;
 const sizeY = 379;
 
@@ -6,89 +8,53 @@ var margin = {top: 30, right: 30, bottom: 70, left: 60},
     width = 460 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
 
-
-
-const createLegende = function(){
-    var svg = d3.select("#legende")
-        .append("svg")
-    
-    svg.attr("width", 100)
-        .attr("height", 50)
-        .classed("centered", true);
-    
-        
-    var group = svg.append("g");
-    group.append("rect")
-        .attr("x", 10)
-        .attr("y", 10)
-        .attr("width", 20)
-        .attr("height", 10)
-        .style("fill", "Lightblue");
-    group.append("text")
-        .attr("x", 35)
-        .attr("y", 20)
-        .text("Risk2")
-
-    group.append("rect")
-        .attr("x", 10)
-        .attr("y", 30)
-        .attr("width", 20)
-        .attr("height", 10)
-        .style("fill", "Blue");
-    group.append("text")
-        .attr("x", 35)
-        .attr("y", 40)
-        .text("Risk3")
-}
-createLegende();
-
-function setFocus(map_id)
-{
-    if (button[map_id-1]) {
-        document.getElementById('focus').innerHTML = '<h2> Focus on map ' + map_id + '</h2>';
-    }
-}
-
-setFocus(1);
-
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-
 var waterBodies;
 var filtered;
-var scaleFix;
-var pollutants;
-var waterBodyIdentifier;
-var chart;
+var usableDataForBars, xScaleFix;
+var totalByProperty, sortByPropertyName, byWaterBodyIdentifier;
+var barChart;
 var createChart = function(){
-  d3.csv("../data/T_WISE6_AggregatedData_FR.csv").then(function(data){
+  console.log(waterBodies);
+  if (waterBodies == undefined){
+    d3.csv("../data/T_WISE6_AggregatedData_FR.csv", d3.autotype).then(function(data){
       waterBodies = data//.filter(function(d,i){ return i<10 });
       filtered = waterBodies.filter(function(d){ return  !(d.observedPropertyDeterminandLabel == "pH" || d.observedPropertyDeterminandLabel == "Oxygen saturation" || d.observedPropertyDeterminandLabel == "Water temperature" || d.observedPropertyDeterminandLabel == "Hardness" || d.observedPropertyDeterminandLabel == "Hydrogen Carbonate (Bicarbonate) HCO3") })
-      scaleFix = filtered.map(function(d){ 
+      
+      usableDataForBars = filtered.map(function(d){ 
         if (d.resultUom == "ug/L") {
           d.resultMeanValue = d.resultMeanValue/1000;
         }
         return d;
-      })
-      pollutants = d3.group(waterBodies, function(d){return(d.observedPropertyDeterminandLabel)});
-      waterBodyIdentifier = d3.group(waterBodies, function(d){return(d.monitoringSiteIdentifier)});
-      chart = StackedBarChart(scaleFix, {
-          x: d => d.observedPropertyDeterminandLabel,
-          y: d => d.resultMeanValue,
-          z: d => d.monitoringSiteIdentifier,
-          xDomain: d3.groupSort(scaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel),
-          yLabel: "↑ Population (millions)",
-          //zDomain: waterBodyIdentifier,
-          colors: d3.schemeSpectral[pollutants.length],
-          width: 1500,
-          height: 500
-      })
-      document.getElementById("focus").append(chart)
-  });
+      });
+
+      totalByProperty = d3.rollup(usableDataForBars, v => d3.sum(v, d => d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
+      console.log(totalByProperty);
+
+      xScaleFix = usableDataForBars.filter(function(d){
+        return totalByProperty.get(d.observedPropertyDeterminandLabel) > 100;
+      });
+      sortByPropertyName = d3.groupSort(xScaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
+      console.log(xScaleFix);
+      byWaterBodyIdentifier = d3.group(waterBodies, function(d){return(d.monitoringSiteIdentifier)});
+    });
+  } else {
+    barChart = StackedBarChart(xScaleFix, {
+      x: d => d.observedPropertyDeterminandLabel,
+      y: d => d.resultMeanValue,
+      z: d => d.monitoringSiteIdentifier,
+      xDomain: sortByPropertyName,
+      yLabel: "↑ Population (millions)",
+      //zDomain: waterBodyIdentifier,
+      colors: d3.schemeSpectral[totalByProperty.length],
+      width: 1500,
+      height: 500
+    });
+    document.getElementById(placeForBarChart).append(barChart);
+  }
 }
 
-//createChart();
+createChart();
 
-// d3.select("#test").append(chart);
 // Copyright 2021 Observable, Inc.
 // Released under the ISC license.
 // https://observablehq.com/@d3/stacked-bar-chart
