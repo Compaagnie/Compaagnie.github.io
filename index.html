@@ -18,8 +18,8 @@
         This visualization is for local inhabitants that wants to check the quality of water next to where they live. Afterall, it's important to drink clean water that won't endanger your health.
       </div>
       
-      <script type="module" src="./js/main.js"></script>
-      <script type="text/javascript" src="js/d3.v5.min.js"></script>
+      <script type="text/javascript" src="./node_modules/d3/dist/d3.min.js"></script>
+      <script type="text/javascript" src="js/main.js"></script>
       <script type="text/javascript" src="js/interaction.js"></script>
       <!-- <script type="text/javascript" src="./js/interactions.js"></script> -->
 
@@ -67,7 +67,9 @@
           </div>
         </div>
       </div>
-      <div id="test">test</div>
+      <div id="test">test
+        <button class="btn btn-primary" onclick="createChart()">Bar chart</button>
+      </div>
       <div id="focus">
         <h2>Focus</h2>
       </div>
