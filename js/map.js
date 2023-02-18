@@ -52,8 +52,8 @@ d3.csv("data/PosArea.csv", d => {
 function BubbleMap(data){
 
   var size = d3.scaleLinear()
-      .domain([0,1500])  // What's in the data
-      .range([ 1, 5]);
+      .domain([0,50])  // What's in the data
+      .range([ 1, 10]);
    
 
   svgMap
@@ -63,10 +63,11 @@ function BubbleMap(data){
       .append("circle")
         .attr("cx", function(d){ return projection([d.lon, d.lat])[0] })
         .attr("cy", function(d){ return projection([d.lon, d.lat])[1] })
-        .attr("r", function(d){ return size(d.area) })
+        .attr("r", function(d){ return size(Math.sqrt(d.area/Math.PI))})
         .attr("stroke-width", 3)
         .attr("fill-opacity", .4)
         .attr("fill", "blue")
+
 
   var height = 100
   var width = 100
@@ -77,8 +78,8 @@ function BubbleMap(data){
 
   // The scale you use for bubble size
   var size = d3.scaleSqrt()
-    .domain([0, 1500])  // What's in the data, let's say it is percentage
-    .range([1, 100])  // Size in pixel
+    .domain([0, 50])  // What's in the data, let's say it is percentage
+    .range([1, 10])  // Size in pixel
 
   // Add legend: circles
   var valuesToShow = [10, 50, 100]
