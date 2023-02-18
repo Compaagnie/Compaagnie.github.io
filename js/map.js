@@ -53,7 +53,7 @@ function BubbleMap(data){
 
   var size = d3.scaleLinear()
       .domain([0,50])  // What's in the data
-      .range([ 1, 10]);
+      .range([ 1, 15]);
    
 
   svgMap
@@ -64,63 +64,55 @@ function BubbleMap(data){
         .attr("cx", function(d){ return projection([d.lon, d.lat])[0] })
         .attr("cy", function(d){ return projection([d.lon, d.lat])[1] })
         .attr("r", function(d){ return size(Math.sqrt(d.area/Math.PI))})
-        .attr("stroke-width", 3)
+        .attr("stroke-width", 1)
+        .attr("stroke", "#219ebc" )
         .attr("fill-opacity", .4)
-        .attr("fill", "blue")
+        .attr("fill", "#a8dadc" )
 
-
-  var height = 100
-  var width = 100
-  var svgLeg = d3.select("#map")
-    .append("svg")
-      .attr("width", width)
-      .attr("height", height)
 
   // The scale you use for bubble size
   var size = d3.scaleSqrt()
     .domain([0, 50])  // What's in the data, let's say it is percentage
-    .range([1, 10])  // Size in pixel
+    .range([1, 15])  // Size in pixel
 
   // Add legend: circles
-  var valuesToShow = [10, 50, 100]
+  var valuesToShow = [1000, 3000, 6000]
   var xCircle = 30
   var xLabel = 70
-  var yCircle = 70
-  svgLeg
+  var yCircle = 400
+  svgMap
     .selectAll("legend")
     .data(valuesToShow)
     .enter()
     .append("circle")
       .attr("cx", xCircle)
-      .attr("cy", d => yCircle - size(d))
-      .attr("r", d => size(d))
+      .attr("cy", d => yCircle - size(Math.sqrt(d/Math.PI)))
+      .attr("r", d => size(Math.sqrt(d/Math.PI)))
       .style("fill", "none")
       .attr("stroke", "black")
 
   // Add legend: segments
-  svgLeg
+  svgMap
     .selectAll("legend")
     .data(valuesToShow)
     .enter()
     .append("line")
-      .attr('x1', d => xCircle + size(d) )
+      .attr('x1', d => xCircle + size(Math.sqrt(d/Math.PI)) )
       .attr('x2', xLabel)
-      .attr('y1', d => yCircle - size(d) )
-      .attr('y2', d => yCircle - size(d) )
+      .attr('y1', d => yCircle - size(Math.sqrt(d/Math.PI)) )
+      .attr('y2', d => yCircle - size(Math.sqrt(d/Math.PI)) )
       .attr('stroke', 'black')
       .style('stroke-dasharray', ('2,2'))
 
   // Add legend: labels
-  svgLeg
+  svgMap
     .selectAll("legend")
     .data(valuesToShow)
     .enter()
     .append("text")
       .attr('x', xLabel)
-      .attr('y', d => yCircle - size(d) )
+      .attr('y', d => yCircle - size((Math.sqrt(d/Math.PI))) )
       .text( d => d )
-      .style("font-size", 10)
       .attr('alignment-baseline', 'middle')
 
-  console.log(svgLeg);
 }
