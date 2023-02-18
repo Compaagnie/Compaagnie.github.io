@@ -1,3 +1,5 @@
+const placeForBarChart = "test";
+
 const sizeX = 400;
 const sizeY = 379;
 
@@ -6,54 +8,53 @@ var margin = {top: 30, right: 30, bottom: 70, left: 60},
     width = 460 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
 
-
-function setFocus(map_id)
-{
-    if (button[map_id-1]) {
-        document.getElementById('focus').innerHTML = '<h2> Focus on map ' + map_id + '</h2>';
-    }
-}
-
-setFocus(1);
-
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-
 var waterBodies;
 var filtered;
-var scaleFix;
-var pollutants;
-var waterBodyIdentifier;
-var chart;
+var usableDataForBars, xScaleFix;
+var totalByProperty, sortByPropertyName, byWaterBodyIdentifier;
+var barChart;
 var createChart = function(){
-  d3.csv("../data/T_WISE6_AggregatedData_FR.csv").then(function(data){
+  console.log(waterBodies);
+  if (waterBodies == undefined){
+    d3.csv("../data/T_WISE6_AggregatedData_FR.csv", d3.autotype).then(function(data){
       waterBodies = data//.filter(function(d,i){ return i<10 });
       filtered = waterBodies.filter(function(d){ return  !(d.observedPropertyDeterminandLabel == "pH" || d.observedPropertyDeterminandLabel == "Oxygen saturation" || d.observedPropertyDeterminandLabel == "Water temperature" || d.observedPropertyDeterminandLabel == "Hardness" || d.observedPropertyDeterminandLabel == "Hydrogen Carbonate (Bicarbonate) HCO3") })
-      scaleFix = filtered.map(function(d){ 
+      
+      usableDataForBars = filtered.map(function(d){ 
         if (d.resultUom == "ug/L") {
           d.resultMeanValue = d.resultMeanValue/1000;
         }
         return d;
-      })
-      pollutants = d3.group(waterBodies, function(d){return(d.observedPropertyDeterminandLabel)});
-      waterBodyIdentifier = d3.group(waterBodies, function(d){return(d.monitoringSiteIdentifier)});
-      chart = StackedBarChart(scaleFix, {
-          x: d => d.observedPropertyDeterminandLabel,
-          y: d => d.resultMeanValue,
-          z: d => d.monitoringSiteIdentifier,
-          xDomain: d3.groupSort(scaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel),
-          yLabel: "↑ Population (millions)",
-          //zDomain: waterBodyIdentifier,
-          colors: d3.schemeSpectral[pollutants.length],
-          width: 1500,
-          height: 500
-      })
-      document.getElementById("test").append(chart)
-  });
+      });
+
+      totalByProperty = d3.rollup(usableDataForBars, v => d3.sum(v, d => d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
+      console.log(totalByProperty);
+
+      xScaleFix = usableDataForBars.filter(function(d){
+        return totalByProperty.get(d.observedPropertyDeterminandLabel) > 100;
+      });
+      sortByPropertyName = d3.groupSort(xScaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
+      console.log(xScaleFix);
+      byWaterBodyIdentifier = d3.group(waterBodies, function(d){return(d.monitoringSiteIdentifier)});
+    });
+  } else {
+    barChart = StackedBarChart(xScaleFix, {
+      x: d => d.observedPropertyDeterminandLabel,
+      y: d => d.resultMeanValue,
+      z: d => d.monitoringSiteIdentifier,
+      xDomain: sortByPropertyName,
+      yLabel: "↑ Population (millions)",
+      //zDomain: waterBodyIdentifier,
+      colors: d3.schemeSpectral[totalByProperty.length],
+      width: 1500,
+      height: 1500
+    });
+    document.getElementById(placeForBarChart).append(barChart);
+  }
 }
 
-//createChart();
+createChart();
 
-// d3.select("#test").append(chart);
 // Copyright 2021 Observable, Inc.
 // Released under the ISC license.
 // https://observablehq.com/@d3/stacked-bar-chart
@@ -64,7 +65,7 @@ function StackedBarChart(data, {
     title, // given d in data, returns the title text
     marginTop = 30, // top margin, in pixels
     marginRight = 0, // right margin, in pixels
-    marginBottom = 30, // bottom margin, in pixels
+    marginBottom = 200, // bottom margin, in pixels
     marginLeft = 40, // left margin, in pixels
     width = 640, // outer width, in pixels
     height = 400, // outer height, in pixels
@@ -81,6 +82,8 @@ function StackedBarChart(data, {
     yLabel, // a label for the y-axis
     colors = d3.schemeTableau10, // array of colors
   } = {}) {
+    const margins = {top: 10, right: 30, bottom: 80, left: 20};
+
     // Compute values.
     const X = d3.map(data, x);
     const Y = d3.map(data, y);
@@ -164,9 +167,15 @@ function StackedBarChart(data, {
     if (title) bar.append("title")
         .text(({i}) => title(i));
   
-     svg.append("g")
-         .attr("transform", `translate(0,${yScale(0)})`)
-         .call(xAxis);
+    const xGroup = svg.append("g")
+      .attr("transform", `translate(0,${yScale(0)})`)
+      .call(xAxis);
+
+    xGroup.selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", ".15em")
+      .attr("transform", "rotate(-65)");
     //console.log(Object.assign(svg.node(), {scales: {color}}));
     return Object.assign(svg.node(), {scales: {color}});
 }
