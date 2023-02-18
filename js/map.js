@@ -21,10 +21,10 @@ let zoom = d3.zoom()
        svgMap.attr('transform', event.transform)
    });
  
-const container = d3.select("#map");
+const container = d3.select("#map")	;
 container.call(zoom);
 
-const deps = svgMap.append("g");
+const deps = svgMap.append("g").classed("departments", true);
 
 d3.json('data/departments.json').then(function(geojson) {
   deps.selectAll("path")
@@ -35,6 +35,12 @@ d3.json('data/departments.json').then(function(geojson) {
     .style("fill", "#e0e0e0")
     .style("stroke", "white");
 });
+
+var Tooltip;
+var circles;
+
+var usableDataForMap_notunique = undefined;
+var usableDataForMap = undefined;
 
 d3.csv("data/PosArea.csv", d => {
   return {
@@ -48,22 +54,84 @@ d3.csv("data/PosArea.csv", d => {
 }).then(data => {
   // sort the data by body of water and longitude so we don't get empty lon/lat
   data = data.sort((a, b) => d3.ascending(a.idBW, b.idBW) || d3.ascending(a.lon, b.lon));
+	
+	// save loaded data for later usage
+	usableDataForMap_notunique = data;
+
   // remove duplicate water body
   const uniqueBW = [...new Map(data.map((m) => [m.idBW, m])).values()];
   var dataBW = uniqueBW.filter(function(d) { return d.lon != "" && d.lat != "" && d.area != "" && d.area != " "});
 
   //data = uniqueBW.map(getArea);
-  console.log(dataBW);
+  // console.log(dataBW);
 
+	usableDataForMap = uniqueBW;
   var chart = BubbleMap(uniqueBW);
-
 })
+
+// current sources selected on the map
+var map_selection = [];
+
+// a function used to select a source (or multiple sources) 
+// and filter the bar chart by those sources
+function map_mouseclick(event, d)
+{	
+	// add to array or change array depending on click
+	if(event.shiftKey) map_selection.push(d.idBW);
+	else map_selection = [d.idBW];
+
+	console.log(map_selection);
+
+	// Get filtered idBW
+	const filtered_bw = usableDataForMap_notunique.filter(
+		function(d) 
+		{ 
+			return map_selection.find(m => m == d.idBW);
+	});
+
+	// Get sites corresponding to those
+	const filtered_sites = filtered_bw.map((m) => [m.idSite]);
+	
+	console.log(filtered_sites);
+	
+	// Filter the bar_chart data to match only the identifiers
+	const filtered_bars = usableDataForBars.filter(
+		function(d)
+		{ 
+			// console.log(d.monitoringSiteIdentifier);
+			return filtered_sites.find(s => s == d.monitoringSiteIdentifier);
+		});
+	
+	console.log(filtered_bars);
+
+	// var new_bar_chart = create_bar_chart_from_data(filtered_bars);
+	// document.getElementById(placeForBarChart).append(new_bar_chart);
+}
+
+
+// Three function that change the tooltip
+// when user hover / move / leave a cell
+function map_mouseover(event, d) 
+{
+	Tooltip.style("opacity", 1)
+}
+function map_mousemove(event, d) 
+{
+	Tooltip
+		.html(d.name + "<br>" + "area: " + d.area + "<br> long: " + d.lon + " lat:  " + d.lat)
+		.style("left", (event.x)/2 + "px")
+		.style("top", (event.y)/2 + "px")
+}
+function map_mouseleave(event, d) {
+	Tooltip.style("opacity", 0)
+}
+
 
 
 function BubbleMap(data){
 
   // create a tooltip
-  var Tooltip = d3.select("#map")
+  Tooltip = d3.select("#map")
     .append("div")
     .attr("class", "tooltip")
     .style("opacity", 0)
@@ -72,41 +140,30 @@ function BubbleMap(data){
     .style("border-width", "2px")
     .style("border-radius", "5px")
     .style("padding", "5px")
-
-    // Three function that change the tooltip when user hover / move / leave a cell
-  var mouseover = function(event, d) {
-    Tooltip.style("opacity", 1)
-  }
-  var mousemove = function(event, d) {
-    Tooltip
-      .html(d.name + "<br>" + "area: " + d.area + "<br> long: " + d.lon + " lat:  " + d.lat)
-      .style("left", (event.x)/2 + "px")
-      .style("top", (event.y)/2 + "px")
-  }
-  var mouseleave = function(event, d) {
-    Tooltip.style("opacity", 0)
-  }
+	
 
   var size = d3.scaleLinear()
       .domain([0,50])  // What's in the data
       .range([ 1, 15]);
    
 
-  svgMap
-      .selectAll("myCircles")
-      .data(data)
-      .enter()
-      .append("circle")
-        .attr("cx", function(d){ return projection([d.lon, d.lat])[0] })
-        .attr("cy", function(d){ return projection([d.lon, d.lat])[1] })
-        .attr("r", function(d){ return size(Math.sqrt(d.area/Math.PI))})
-        .attr("stroke-width", 1)
-        .attr("stroke", "#219ebc" )
-        .attr("fill-opacity", .4)
-        .attr("fill", "#a8dadc" )
-      .on("mouseover", mouseover)
-      .on("mousemove", mousemove)
-      .on("mouseleave", mouseleave)
+  circles = svgMap.append("g").classed("circles", true)
+
+	circles.selectAll("circle")
+		.data(data, d => d.idSite)
+		.enter()
+		.append("circle")
+			.attr("cx", function(d){ return projection([d.lon, d.lat])[0] })
+			.attr("cy", function(d){ return projection([d.lon, d.lat])[1] })
+			.attr("r", function(d){ return size(Math.sqrt(d.area/Math.PI))})
+			.attr("stroke-width", 1)
+			.attr("stroke", "#219ebc")
+			.attr("fill-opacity", .4)
+			.attr("fill", "#a8dadc" )
+		.on("mouseover", map_mouseover)
+		.on("mousemove", map_mousemove)
+		.on("mouseleave", map_mouseleave)
+		.on("click", map_mouseclick)
 
   // Add legend: circles
   var valuesToShow = [1000, 3000, 6000]

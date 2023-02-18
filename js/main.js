@@ -1,4 +1,4 @@
-const placeForBarChart = "test";
+const placeForBarChart = "bar";
 
 const sizeX = 400;
 const sizeY = 379;
@@ -19,34 +19,110 @@ var byWaterBodyIdentifier;
 var xScaleFix, sortByPropertyName;
 var barChart;
 var tmp3;
+
+
+function process_bar_data(data)
+{
+	filtered = data.filter(function(d){ return  !(d.observedPropertyDeterminandLabel == "Calcium" || d.observedPropertyDeterminandLabel == "pH" || d.observedPropertyDeterminandLabel == "Oxygen saturation" || d.observedPropertyDeterminandLabel == "Water temperature" || d.observedPropertyDeterminandLabel == "Hardness" || d.observedPropertyDeterminandLabel == "Hydrogen Carbonate (Bicarbonate) HCO3") })
+	totalByProperty = d3.rollup(data, v => d3.sum(v, d => d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
+	byWaterBodyIdentifier = d3.group(data, function(d){return(d.monitoringSiteIdentifier)});
+
+	xScaleFix = filtered.filter(function(d){
+		return totalByProperty.get(d.observedPropertyDeterminandLabel) > 100;
+	});
+	sortByPropertyName = d3.groupSort(xScaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
+}
+
+function create_bar_chart_from_data(data)
+{
+	process_bar_data(data);
+
+  return StackedBarChart(xScaleFix, {
+		x: d => d.observedPropertyDeterminandLabel,
+		y: d => d.resultMeanValue,
+		z: d => d.monitoringSiteIdentifier,
+		xDomain: sortByPropertyName,
+		yLabel: "↑ Population (millions)",
+		//zDomain: waterBodyIdentifier,
+		colors: d3.schemeSpectral[totalByProperty.length],
+		width: 1500,
+		height: 1500
+	});
+}
+
+// function used to filter on polluant for the map
+function bar_mouseclick(event, d)
+{
+	// console.log(event, d);
+	var site_ids = []
+	for(var m of d.data[1]){ site_ids.push(m[0]); }
+
+	console.log("Site ids:",site_ids);
+	const map_filtered = usableDataForMap.filter(
+	// const map_filtered = usableDataForMap_notunique.filter(
+		function(d)
+		{
+			return site_ids.find(m => m == d.idSite);
+		}
+	);
+
+	console.log("Map filtered:", map_filtered);
+	// console.log(all_ids);
+
+	var size = d3.scaleLinear()
+      .domain([0,50])  // What's in the data
+      .range([1, 15]);
+
+	circles.selectAll("circle")
+		.data(map_filtered, d => d.idSite)
+		.join(
+			enter =>
+			{
+				enter
+					.append("circle")
+					.attr("cx", function(d){ return projection([d.lon, d.lat])[0] })
+					.attr("cy", function(d){ return projection([d.lon, d.lat])[1] })
+					.attr("r", function(d){ return size(Math.sqrt(d.area/Math.PI)) })
+					.attr("stroke-width", 1)
+					.attr("stroke", "#219ebc" )
+					.attr("fill-opacity", .4)
+					.attr("fill", "#a8dadc" )
+					// .attr("fill", "#ff0000" )
+					.on("mouseover", map_mouseover)
+					.on("mousemove", map_mousemove)
+					.on("mouseleave", map_mouseleave)
+					.on("click", map_mouseclick);
+				// console.log(enter);
+			}
+			,
+			update => 
+			{
+				// console.log(update)
+				// update.attr("fill", "#00ff00")
+			}
+			,
+			exit =>
+			{
+				// console.log(exit);
+				exit.remove();
+			}
+		)
+	
+
+	// BubbleMap(map_filtered);
+}
+
+
 var createChart = function(){
-  if (usableDataForBars == undefined){
+  if (usableDataForBars == undefined)
+	{
     d3.csv("../data/waterBodiesData.csv", d3.autotype).then(function(data){
       usableDataForBars = data;
-
-      filtered = usableDataForBars.filter(function(d){ return  !(d.observedPropertyDeterminandLabel == "Calcium" || d.observedPropertyDeterminandLabel == "pH" || d.observedPropertyDeterminandLabel == "Oxygen saturation" || d.observedPropertyDeterminandLabel == "Water temperature" || d.observedPropertyDeterminandLabel == "Hardness" || d.observedPropertyDeterminandLabel == "Hydrogen Carbonate (Bicarbonate) HCO3") })
-      totalByProperty = d3.rollup(usableDataForBars, v => d3.sum(v, d => d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
-      byWaterBodyIdentifier = d3.group(usableDataForBars, function(d){return(d.monitoringSiteIdentifier)});
-
-
-      xScaleFix = filtered.filter(function(d){
-        return totalByProperty.get(d.observedPropertyDeterminandLabel) > 100;
-      });
-      sortByPropertyName = d3.groupSort(xScaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
-    })
-    
-  } else {
-    barChart = StackedBarChart(xScaleFix, {
-      x: d => d.observedPropertyDeterminandLabel,
-      y: d => d.resultMeanValue,
-      z: d => d.monitoringSiteIdentifier,
-      xDomain: sortByPropertyName,
-      yLabel: "↑ Population (millions)",
-      //zDomain: waterBodyIdentifier,
-      colors: d3.schemeSpectral[totalByProperty.length],
-      width: 1500,
-      height: 1500
-    });
+		})
+  } 
+	else 
+	{
+    barChart = create_bar_chart_from_data(usableDataForBars);
     document.getElementById(placeForBarChart).append(barChart);
   }
 }
@@ -148,6 +224,7 @@ function StackedBarChart(data, {
             .attr("fill", "currentColor")
             .attr("text-anchor", "start")
             .text(yLabel));
+
   
     const bar = svg.append("g")
     .selectAll("g")
@@ -160,10 +237,13 @@ function StackedBarChart(data, {
         .attr("x", ({i}) => xScale(X[i]))
         .attr("y", ([y1, y2]) => Math.min(yScale(y1), yScale(y2)))
         .attr("height", ([y1, y2]) => Math.abs(yScale(y1) - yScale(y2)))
-        .attr("width", xScale.bandwidth());
+        .attr("width", xScale.bandwidth())
+				
   
     if (title) bar.append("title")
         .text(({i}) => title(i));
+
+		bar.on("click", bar_mouseclick);
   
     const xGroup = svg.append("g")
       .attr("transform", `translate(0,${yScale(0)})`)
