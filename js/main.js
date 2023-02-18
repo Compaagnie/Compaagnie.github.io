@@ -1,4 +1,4 @@
-const placeForBarChart = "test";
+const placeForBarChart = "focus";
 
 const sizeX = 400;
 const sizeY = 379;
@@ -163,11 +163,11 @@ function StackedBarChart(data, {
         .text(({i}) => title(i));
   
     const xGroup = svg.append("g")
+      .style("font-size", "1em")
       .attr("transform", `translate(0,${yScale(0)})`)
       .call(xAxis);
 
     xGroup.selectAll("text")
-      .attr("font-size", "2em")
       .style("text-anchor", "end")
       .attr("dx", "-.8em")
       .attr("dy", ".15em")
