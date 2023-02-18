@@ -17,8 +17,8 @@ var createJSON = function(){
         byWaterBodyIdentifier = d3.map(d3.group(usableDataForBars, function(d){return(d.monitoringSiteIdentifier)}), d => d[0]);
         console.log(byWaterBodyIdentifier);
         
-        downloadCSV({data:usableDataForBars})
-        downloadFile(JSON.stringify(byWaterBodyIdentifier,null,' '))
+        downloadCSV({data:usableDataForBars});
+        downloadFile(JSON.stringify(byWaterBodyIdentifier,null,' '));
         
         console.log(usableDataForBars);
     });

@@ -42,7 +42,7 @@ var createChart = function(){
       //zDomain: waterBodyIdentifier,
       colors: d3.schemeSpectral[totalByProperty.length],
       width: 1500,
-      height: 1500
+      height: 1000
     });
     document.getElementById(placeForBarChart).append(barChart);
   }
@@ -60,7 +60,7 @@ function StackedBarChart(data, {
     title, // given d in data, returns the title text
     marginTop = 30, // top margin, in pixels
     marginRight = 0, // right margin, in pixels
-    marginBottom = 200, // bottom margin, in pixels
+    marginBottom = 300, // bottom margin, in pixels
     marginLeft = 40, // left margin, in pixels
     width = 640, // outer width, in pixels
     height = 400, // outer height, in pixels
@@ -130,7 +130,7 @@ function StackedBarChart(data, {
         .attr("width", width)
         .attr("height", height)
         .attr("viewBox", [0, 0, width, height])
-        .attr("style", "max-width: 100%; height: auto; height: intrinsic;");
+        .attr("style", "height: auto; height: intrinsic; overflow-x:scroll;");
   
     svg.append("g")
         .attr("transform", `translate(${marginLeft},0)`)
@@ -167,6 +167,7 @@ function StackedBarChart(data, {
       .call(xAxis);
 
     xGroup.selectAll("text")
+      .attr("font-size", "2em")
       .style("text-anchor", "end")
       .attr("dx", "-.8em")
       .attr("dy", ".15em")
