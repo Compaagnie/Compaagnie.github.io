@@ -1,4 +1,4 @@
-const placeForBarChart = "bar";
+const placeForBarChart = "focus";
 
 const sizeX = 400;
 const sizeY = 379;
@@ -10,45 +10,46 @@ var margin = {top: 30, right: 30, bottom: 70, left: 60},
 
 // all the data
 var usableDataForBars; 
-// filtered to remove some columns that are too big
-var filtered;
 // total value for each property that exists
 var totalByProperty;
 // grouped by waterBodyIdentifier
 var byWaterBodyIdentifier;
 var xScaleFix, sortByPropertyName;
 var barChart;
-var tmp3;
 
 
-function process_bar_data(data)
-{
-	filtered = data.filter(function(d){ return  !(d.observedPropertyDeterminandLabel == "Calcium" || d.observedPropertyDeterminandLabel == "pH" || d.observedPropertyDeterminandLabel == "Oxygen saturation" || d.observedPropertyDeterminandLabel == "Water temperature" || d.observedPropertyDeterminandLabel == "Hardness" || d.observedPropertyDeterminandLabel == "Hydrogen Carbonate (Bicarbonate) HCO3") })
-	totalByProperty = d3.rollup(data, v => d3.sum(v, d => d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
-	byWaterBodyIdentifier = d3.group(data, function(d){return(d.monitoringSiteIdentifier)});
+var createChart = function(){
+  if (usableDataForBars == undefined){
+    d3.csv("../data/waterBodiesData.csv", d3.autotype).then(function(data){
+      usableDataForBars = data;
 
-	xScaleFix = filtered.filter(function(d){
-		return totalByProperty.get(d.observedPropertyDeterminandLabel) > 100;
-	});
-	sortByPropertyName = d3.groupSort(xScaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
+      totalByProperty = d3.rollup(usableDataForBars, v => d3.sum(v, d => d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
+      byWaterBodyIdentifier = d3.group(usableDataForBars, function(d){return(d.monitoringSiteIdentifier)});
+      console.log(byWaterBodyIdentifier);
+
+      xScaleFix = usableDataForBars.filter(function(d){
+        return (totalByProperty.get(d.observedPropertyDeterminandLabel) > 100 && totalByProperty.get(d.observedPropertyDeterminandLabel) < 8000 );
+      });
+      sortByPropertyName = d3.groupSort(xScaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
+    })
+    
+  } else {
+    barChart = StackedBarChart(xScaleFix, {
+      x: d => d.observedPropertyDeterminandLabel,
+      y: d => d.resultMeanValue,
+      z: d => d.monitoringSiteIdentifier,
+      xDomain: sortByPropertyName,
+      yLabel: "↑ Quantity (mg/L)",
+      //zDomain: waterBodyIdentifier,
+      colors: d3.schemeSpectral[totalByProperty.length],
+      width: 1500,
+      height: 1000
+    });
+    document.getElementById(placeForBarChart).append(barChart);
+  }
 }
 
-function create_bar_chart_from_data(data)
-{
-	process_bar_data(data);
-
-  return StackedBarChart(xScaleFix, {
-		x: d => d.observedPropertyDeterminandLabel,
-		y: d => d.resultMeanValue,
-		z: d => d.monitoringSiteIdentifier,
-		xDomain: sortByPropertyName,
-		yLabel: "↑ Population (millions)",
-		//zDomain: waterBodyIdentifier,
-		colors: d3.schemeSpectral[totalByProperty.length],
-		width: 1500,
-		height: 1500
-	});
-}
+createChart();
 
 // function used to filter on polluant for the map
 function bar_mouseclick(event, d)
@@ -112,23 +113,6 @@ function bar_mouseclick(event, d)
 	// BubbleMap(map_filtered);
 }
 
-
-var createChart = function(){
-  if (usableDataForBars == undefined)
-	{
-    d3.csv("../data/waterBodiesData.csv", d3.autotype).then(function(data){
-      usableDataForBars = data;
-		})
-  } 
-	else 
-	{
-    barChart = create_bar_chart_from_data(usableDataForBars);
-    document.getElementById(placeForBarChart).append(barChart);
-  }
-}
-
-createChart();
-
 // Copyright 2021 Observable, Inc.
 // Released under the ISC license.
 // https://observablehq.com/@d3/stacked-bar-chart
@@ -139,7 +123,7 @@ function StackedBarChart(data, {
     title, // given d in data, returns the title text
     marginTop = 30, // top margin, in pixels
     marginRight = 0, // right margin, in pixels
-    marginBottom = 200, // bottom margin, in pixels
+    marginBottom = 300, // bottom margin, in pixels
     marginLeft = 40, // left margin, in pixels
     width = 640, // outer width, in pixels
     height = 400, // outer height, in pixels
@@ -209,7 +193,7 @@ function StackedBarChart(data, {
         .attr("width", width)
         .attr("height", height)
         .attr("viewBox", [0, 0, width, height])
-        .attr("style", "max-width: 100%; height: auto; height: intrinsic;");
+        .attr("style", "height: auto; height: intrinsic; overflow-x:scroll;");
   
     svg.append("g")
         .attr("transform", `translate(${marginLeft},0)`)
@@ -246,6 +230,7 @@ function StackedBarChart(data, {
 		bar.on("click", bar_mouseclick);
   
     const xGroup = svg.append("g")
+      .style("font-size", "1em")
       .attr("transform", `translate(0,${yScale(0)})`)
       .call(xAxis);
 

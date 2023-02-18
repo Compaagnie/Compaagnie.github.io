@@ -46,6 +46,7 @@ d3.csv("data/PosArea.csv", d => {
   return {
     idSite: d.monitoringSiteIdentifier,
     idBW: d.waterBodyIdentifier,
+    type: d.waterBodyIdentifierScheme,
     name: d.waterBodyName,
     lon: d.lon,
     lat: d.lat,
@@ -59,14 +60,14 @@ d3.csv("data/PosArea.csv", d => {
 	usableDataForMap_notunique = data;
 
   // remove duplicate water body
-  const uniqueBW = [...new Map(data.map((m) => [m.idBW, m])).values()];
-  var dataBW = uniqueBW.filter(function(d) { return d.lon != "" && d.lat != "" && d.area != "" && d.area != " "});
+  const dataBW = [...new Map(data.map((m) => [m.idBW, m])).values()];
+  //var dataBW = uniqueBW.filter(function(d) { return d.type == "euGroundWaterBodyCode" || d.type == "eionetGroundWaterBodyCode"});
 
   //data = uniqueBW.map(getArea);
   // console.log(dataBW);
 
-	usableDataForMap = uniqueBW;
-  var chart = BubbleMap(uniqueBW);
+	usableDataForMap = dataBW;
+  var chart = BubbleMap(dataBW);
 })
 
 // current sources selected on the map
