@@ -11617,9 +11617,9 @@ textarea.form-control-lg {
 }
 
 #header {
-  background: #0d6efd;
   text-align: center;
   padding: 10px;
+  background-image: url("background.png");
 }
 
 #description {
@@ -11636,14 +11636,10 @@ textarea.form-control-lg {
 }
 
 #map {
-  overflow: hidden;
-}
-
-#map-contain {
   grid-column: 1/2;
   padding: 10px;
   text-align: center;
-  border: solid #757575;
+  border: solid #000;
   overflow: hidden;
 }
 
@@ -11659,16 +11655,16 @@ textarea.form-control-lg {
 }
 
 #risk {
-  border: solid #757575;
+  border: solid #000;
 }
 
 #focus {
-  border: solid #757575;
+  background: rgb(130, 255, 148);
   text-align: center;
 }
 
-.our_foot {
-  text-align: center;
+#foot {
+  background: #6096B4;
 }
 
 #button {
