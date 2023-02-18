@@ -8,35 +8,33 @@ var margin = {top: 30, right: 30, bottom: 70, left: 60},
     width = 460 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
 
-var waterBodies;
+// all the data
+var usableDataForBars; 
+// filtered to remove some columns that are too big
 var filtered;
-var usableDataForBars, xScaleFix;
-var totalByProperty, sortByPropertyName, byWaterBodyIdentifier;
+// total value for each property that exists
+var totalByProperty;
+// grouped by waterBodyIdentifier
+var byWaterBodyIdentifier;
+var xScaleFix, sortByPropertyName;
 var barChart;
+var tmp3;
 var createChart = function(){
-  console.log(waterBodies);
-  if (waterBodies == undefined){
-    d3.csv("../data/T_WISE6_AggregatedData_FR.csv", d3.autotype).then(function(data){
-      waterBodies = data//.filter(function(d,i){ return i<10 });
-      filtered = waterBodies.filter(function(d){ return  !(d.observedPropertyDeterminandLabel == "pH" || d.observedPropertyDeterminandLabel == "Oxygen saturation" || d.observedPropertyDeterminandLabel == "Water temperature" || d.observedPropertyDeterminandLabel == "Hardness" || d.observedPropertyDeterminandLabel == "Hydrogen Carbonate (Bicarbonate) HCO3") })
-      
-      usableDataForBars = filtered.map(function(d){ 
-        if (d.resultUom == "ug/L") {
-          d.resultMeanValue = d.resultMeanValue/1000;
-        }
-        return d;
-      });
+  if (usableDataForBars == undefined){
+    d3.csv("../data/waterBodiesData.csv", d3.autotype).then(function(data){
+      usableDataForBars = data;
 
+      filtered = usableDataForBars.filter(function(d){ return  !(d.observedPropertyDeterminandLabel == "Calcium" || d.observedPropertyDeterminandLabel == "pH" || d.observedPropertyDeterminandLabel == "Oxygen saturation" || d.observedPropertyDeterminandLabel == "Water temperature" || d.observedPropertyDeterminandLabel == "Hardness" || d.observedPropertyDeterminandLabel == "Hydrogen Carbonate (Bicarbonate) HCO3") })
       totalByProperty = d3.rollup(usableDataForBars, v => d3.sum(v, d => d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
-      console.log(totalByProperty);
+      byWaterBodyIdentifier = d3.group(usableDataForBars, function(d){return(d.monitoringSiteIdentifier)});
 
-      xScaleFix = usableDataForBars.filter(function(d){
+
+      xScaleFix = filtered.filter(function(d){
         return totalByProperty.get(d.observedPropertyDeterminandLabel) > 100;
       });
       sortByPropertyName = d3.groupSort(xScaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
-      console.log(xScaleFix);
-      byWaterBodyIdentifier = d3.group(waterBodies, function(d){return(d.monitoringSiteIdentifier)});
-    });
+    })
+    
   } else {
     barChart = StackedBarChart(xScaleFix, {
       x: d => d.observedPropertyDeterminandLabel,
