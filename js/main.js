@@ -16,6 +16,7 @@ var totalByProperty;
 var byWaterBodyIdentifier;
 var xScaleFix, sortByPropertyName;
 var barChart;
+
 var createChart = function(){
   if (usableDataForBars == undefined){
     d3.csv("../data/waterBodiesData.csv", d3.autotype).then(function(data){

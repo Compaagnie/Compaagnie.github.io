@@ -54,7 +54,7 @@ d3.csv("data/PosArea.csv", d => {
   //var dataBW = uniqueBW.filter(function(d) { return d.type == "euGroundWaterBodyCode" || d.type == "eionetGroundWaterBodyCode"});
 
   //data = uniqueBW.map(getArea);
-  console.log(dataBW);
+  // console.log(dataBW);
 
   var chart = BubbleMap(dataBW);
 
