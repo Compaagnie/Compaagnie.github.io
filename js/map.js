@@ -40,6 +40,7 @@ d3.csv("data/PosArea.csv", d => {
   return {
     idSite: d.monitoringSiteIdentifier,
     idBW: d.waterBodyIdentifier,
+    type: d.waterBodyIdentifierScheme,
     name: d.waterBodyName,
     lon: d.lon,
     lat: d.lat,
@@ -49,13 +50,13 @@ d3.csv("data/PosArea.csv", d => {
   // sort the data by body of water and longitude so we don't get empty lon/lat
   data = data.sort((a, b) => d3.ascending(a.idBW, b.idBW) || d3.ascending(a.lon, b.lon));
   // remove duplicate water body
-  const uniqueBW = [...new Map(data.map((m) => [m.idBW, m])).values()];
-  var dataBW = uniqueBW.filter(function(d) { return d.lon != "" && d.lat != "" && d.area != "" && d.area != " "});
+  const dataBW = [...new Map(data.map((m) => [m.idBW, m])).values()];
+  //var dataBW = uniqueBW.filter(function(d) { return d.type == "euGroundWaterBodyCode" || d.type == "eionetGroundWaterBodyCode"});
 
   //data = uniqueBW.map(getArea);
   console.log(dataBW);
 
-  var chart = BubbleMap(uniqueBW);
+  var chart = BubbleMap(dataBW);
 
 })
 
@@ -79,7 +80,7 @@ function BubbleMap(data){
   }
   var mousemove = function(event, d) {
     Tooltip
-      .html(d.name + "<br>" + "area: " + d.area + "<br> long: " + d.lon + " lat:  " + d.lat)
+      .html(d.name + "<br>" + "area: " + d.area + "<br> id: " + d.idBW)
       .style("left", (event.x)/2 + "px")
       .style("top", (event.y)/2 + "px")
   }

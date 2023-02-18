@@ -7,13 +7,13 @@
   <div id="header">
     <h2>Up-Wave</h2>
     <br>
-    <h4>France's underground water sources</h4>
+    <h4>France's water sources</h4>
   </div>
 
   <body>
     <div id="container">
       <div id="description">
-        This website shows France's underground water source, their qualities, and specific risks and pollutants. <br>
+        This website shows France's water source, their qualities, and specific risks and pollutants. <br>
         This map shows the water bodies and colors them according to their quality. For more details about composition, click on the water source. <br>
         This visualization is for local inhabitants that wants to check the quality of water next to where they live. Afterall, it's important to drink clean water that won't endanger your health.
       </div>
@@ -31,15 +31,17 @@
       <!-- <script type="text/javascript" src="./js/interactions.js"></script> -->
 
       <div id="main">
-        <div id="map">
-          <h2>Underground Water Sources</h2>
-          <script type="text/javascript" src="js/map.js"></script>
-          <style>
-            .circle:hover{
-              stroke: black;
-              stroke-width: 4px;
-            }
-            </style>
+        <div id="map-contain">
+          <h2>Water Sources</h2>
+          <div id="map">
+            <script type="text/javascript" src="js/map.js"></script>
+            <style>
+              .circle:hover{
+                stroke: black;
+                stroke-width: 4px;
+              }
+              </style>
+          </div>
         </div>
         <div id="test">
           <button class="btn btn-primary" onclick="createChart()">Bar chart</button>
