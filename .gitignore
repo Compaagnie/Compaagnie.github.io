@@ -129,3 +129,5 @@ data/Waterbase_v2021_1_T_WISE6_AggregatedData.csv
 data/Waterbase_v2021_1_WISE6.sqlite
 data/Waterbase_v2021_1_WISE6.sqlite-journal
 data/Waterbase_v2021_1_T_WISE6_AggregatedData.csv
+*.sqlite
+*.sqlite-journal
