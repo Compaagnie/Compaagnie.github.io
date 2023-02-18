@@ -11635,15 +11635,15 @@ textarea.form-control-lg {
   height: fit-content;
 }
 
+#map {
+  overflow: hidden;
+}
+
 #map-contain {
   grid-column: 1/2;
   padding: 10px;
   text-align: center;
-  border: solid #000;
-  overflow: hidden;
-}
-
-#map {
+  border: solid #757575;
   overflow: hidden;
 }
 
@@ -11659,16 +11659,16 @@ textarea.form-control-lg {
 }
 
 #risk {
-  border: solid #000;
+  border: solid #757575;
 }
 
 #focus {
-  background: rgb(130, 255, 148);
+  border: solid #757575;
   text-align: center;
 }
 
-#foot {
-  background: #6096B4;
+.our_foot {
+  text-align: center;
 }
 
 #button {

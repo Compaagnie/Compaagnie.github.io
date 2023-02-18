@@ -2,23 +2,20 @@ var createJSON = function(){
     d3.csv("../data/T_WISE6_AggregatedData_FR.csv", d3.autotype).then(function(data){
         
         usableDataForBars = d3.merge(
-            d3.map(d3.group(data.map(function(d){ 
-                if (d.resultUom == "ug/L") {
-                d.resultMeanValue = d.resultMeanValue/1000;
-                d.resultUom = "mg/L";
-                }
-                return d;
-            }), d => d.monitoringSiteIdentifier, d => d.observedPropertyDeterminandLabel), d=> {
-                return d3.map(d[1], v => {
-                return v[1].filter(function(d) {return d.phenomenonTimeReferenceYear == d3.max(v[1], x=> +x.phenomenonTimeReferenceYear)})[0];
-                })
+        d3.map(d3.group(data.map(function(d){ 
+            if (d.resultUom == "ug/L") {
+            d.resultMeanValue = d.resultMeanValue/1000;
+            d.resultUom = "mg/L";
+            }
+            return d;
+        }), d => d.monitoringSiteIdentifier, d => d.observedPropertyDeterminandLabel), d=> {
+            return d3.map(d[1], v => {
+            return v[1].filter(function(d) {return d.phenomenonTimeReferenceYear == d3.max(v[1], x=> +x.phenomenonTimeReferenceYear)})[0];
             })
+        })
         );
-        byWaterBodyIdentifier = d3.map(d3.group(usableDataForBars, function(d){return(d.monitoringSiteIdentifier)}), d => d[0]);
-        console.log(byWaterBodyIdentifier);
         
         downloadCSV({data:usableDataForBars})
-        downloadFile(JSON.stringify(byWaterBodyIdentifier,null,' '))
         
         console.log(usableDataForBars);
     });
@@ -73,19 +70,3 @@ function downloadCSV(args) {
     link.setAttribute('download', filename);
     link.click();
 }
-
-function downloadURL(url, name) {
-    var link = document.createElement("a");
-    link.download = name;
-    link.href = url;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    delete link;
-  }
-  
-  function downloadFile(data) {
-    var blob = new Blob([data], {type: 'text/json'});
-    var url  = window.URL.createObjectURL(blob);
-    downloadURL(url, "test.json");
-  }

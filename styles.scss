@@ -28,15 +28,11 @@
     height: fit-content;
 }
 
-#map-contain{
+#map{
     grid-column: 1/2;
     padding: 10px;
     text-align: center;
     border: solid #000;
-    overflow: hidden;
-}
-
-#map{
     overflow: hidden;
 }
 
