@@ -10,7 +10,19 @@ path.projection(projection);
 const svgMap = d3.select('#map').append("svg")
   .attr("id", "svg")
   .attr("width", widthMap)
-  .attr("height", heightMap);
+  .attr("height", heightMap)
+  ;
+
+
+	
+let zoom = d3.zoom()
+   .scaleExtent([1, 3])
+   .on('zoom', event => {
+       svgMap.attr('transform', event.transform)
+   });
+ 
+const container = d3.select("#map");
+container.call(zoom);
 
 const deps = svgMap.append("g");
 
@@ -23,8 +35,6 @@ d3.json('data/departments.json').then(function(geojson) {
     .style("fill", "#e0e0e0")
     .style("stroke", "white");
 });
-
-
 
 d3.csv("data/PosArea.csv", d => {
   return {
@@ -69,7 +79,7 @@ function BubbleMap(data){
   }
   var mousemove = function(event, d) {
     Tooltip
-      .html(d.name + "<br>" + "area: " + d.area)
+      .html(d.name + "<br>" + "area: " + d.area + "<br> long: " + d.lon + " lat:  " + d.lat)
       .style("left", (event.x)/2 + "px")
       .style("top", (event.y)/2 + "px")
   }
@@ -97,12 +107,6 @@ function BubbleMap(data){
       .on("mouseover", mouseover)
       .on("mousemove", mousemove)
       .on("mouseleave", mouseleave)
-
-
-  // The scale you use for bubble size
-  var size = d3.scaleSqrt()
-    .domain([0, 50])  // What's in the data, let's say it is percentage
-    .range([1, 15])  // Size in pixel
 
   // Add legend: circles
   var valuesToShow = [1000, 3000, 6000]
