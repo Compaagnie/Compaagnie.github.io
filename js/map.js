@@ -2,7 +2,7 @@ const widthMap = 550, heightMap = 550;
 const path = d3.geoPath();
 const projection = d3.geoConicConformal()
   .center([2.454071, 46.279229])
-  .scale(2600)
+  .scale(2800)
   .translate([widthMap / 2, heightMap / 2]);
 
 path.projection(projection);
@@ -10,7 +10,19 @@ path.projection(projection);
 const svgMap = d3.select('#map').append("svg")
   .attr("id", "svg")
   .attr("width", widthMap)
-  .attr("height", heightMap);
+  .attr("height", heightMap)
+  ;
+
+
+	
+let zoom = d3.zoom()
+   .scaleExtent([1, 3])
+   .on('zoom', event => {
+       svgMap.attr('transform', event.transform)
+   });
+ 
+const container = d3.select("#map");
+container.call(zoom);
 
 const deps = svgMap.append("g");
 
@@ -24,12 +36,11 @@ d3.json('data/departments.json').then(function(geojson) {
     .style("stroke", "white");
 });
 
-
-
 d3.csv("data/PosArea.csv", d => {
   return {
     idSite: d.monitoringSiteIdentifier,
     idBW: d.waterBodyIdentifier,
+    name: d.waterBodyName,
     lon: d.lon,
     lat: d.lat,
     area: d.cArea
@@ -42,7 +53,7 @@ d3.csv("data/PosArea.csv", d => {
   var dataBW = uniqueBW.filter(function(d) { return d.lon != "" && d.lat != "" && d.area != "" && d.area != " "});
 
   //data = uniqueBW.map(getArea);
-  //console.log(dataBW);
+  console.log(dataBW);
 
   var chart = BubbleMap(uniqueBW);
 
@@ -50,6 +61,31 @@ d3.csv("data/PosArea.csv", d => {
 
 
 function BubbleMap(data){
+
+  // create a tooltip
+  var Tooltip = d3.select("#map")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0)
+    .style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "2px")
+    .style("border-radius", "5px")
+    .style("padding", "5px")
+
+    // Three function that change the tooltip when user hover / move / leave a cell
+  var mouseover = function(event, d) {
+    Tooltip.style("opacity", 1)
+  }
+  var mousemove = function(event, d) {
+    Tooltip
+      .html(d.name + "<br>" + "area: " + d.area + "<br> long: " + d.lon + " lat:  " + d.lat)
+      .style("left", (event.x)/2 + "px")
+      .style("top", (event.y)/2 + "px")
+  }
+  var mouseleave = function(event, d) {
+    Tooltip.style("opacity", 0)
+  }
 
   var size = d3.scaleLinear()
       .domain([0,50])  // What's in the data
@@ -68,12 +104,9 @@ function BubbleMap(data){
         .attr("stroke", "#219ebc" )
         .attr("fill-opacity", .4)
         .attr("fill", "#a8dadc" )
-
-
-  // The scale you use for bubble size
-  var size = d3.scaleSqrt()
-    .domain([0, 50])  // What's in the data, let's say it is percentage
-    .range([1, 15])  // Size in pixel
+      .on("mouseover", mouseover)
+      .on("mousemove", mousemove)
+      .on("mouseleave", mouseleave)
 
   // Add legend: circles
   var valuesToShow = [1000, 3000, 6000]
