@@ -10,27 +10,23 @@ var margin = {top: 30, right: 30, bottom: 70, left: 60},
 
 // all the data
 var usableDataForBars; 
-// filtered to remove some columns that are too big
-var filtered;
 // total value for each property that exists
 var totalByProperty;
 // grouped by waterBodyIdentifier
 var byWaterBodyIdentifier;
 var xScaleFix, sortByPropertyName;
 var barChart;
-var tmp3;
 var createChart = function(){
   if (usableDataForBars == undefined){
     d3.csv("../data/waterBodiesData.csv", d3.autotype).then(function(data){
       usableDataForBars = data;
 
-      filtered = usableDataForBars.filter(function(d){ return  !(d.observedPropertyDeterminandLabel == "Calcium" || d.observedPropertyDeterminandLabel == "pH" || d.observedPropertyDeterminandLabel == "Oxygen saturation" || d.observedPropertyDeterminandLabel == "Water temperature" || d.observedPropertyDeterminandLabel == "Hardness" || d.observedPropertyDeterminandLabel == "Hydrogen Carbonate (Bicarbonate) HCO3") })
       totalByProperty = d3.rollup(usableDataForBars, v => d3.sum(v, d => d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
       byWaterBodyIdentifier = d3.group(usableDataForBars, function(d){return(d.monitoringSiteIdentifier)});
+      console.log(byWaterBodyIdentifier);
 
-
-      xScaleFix = filtered.filter(function(d){
-        return totalByProperty.get(d.observedPropertyDeterminandLabel) > 100;
+      xScaleFix = usableDataForBars.filter(function(d){
+        return (totalByProperty.get(d.observedPropertyDeterminandLabel) > 100 && totalByProperty.get(d.observedPropertyDeterminandLabel) < 8000 );
       });
       sortByPropertyName = d3.groupSort(xScaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
     })
@@ -41,7 +37,7 @@ var createChart = function(){
       y: d => d.resultMeanValue,
       z: d => d.monitoringSiteIdentifier,
       xDomain: sortByPropertyName,
-      yLabel: "↑ Population (millions)",
+      yLabel: "↑ Quantity (mg/L)",
       //zDomain: waterBodyIdentifier,
       colors: d3.schemeSpectral[totalByProperty.length],
       width: 1500,
