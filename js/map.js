@@ -80,7 +80,7 @@ function BubbleMap(data){
   }
   var mousemove = function(event, d) {
     Tooltip
-      .html(d.name + "<br>" + "area: " + d.area + "<br> id: " + d.idBW)
+      .html(d.name + "<br>" + "area: " + d.area + " km2 <br> id: " + d.idBW)
       .style("left", (event.x)/2 + "px")
       .style("top", (event.y)/2 + "px")
   }
@@ -89,7 +89,7 @@ function BubbleMap(data){
   }
 
   var size = d3.scaleLinear()
-      .domain([0,50])  // What's in the data
+      .domain([0,20])  // What's in the data
       .range([ 1, 15]);
    
 
@@ -110,7 +110,7 @@ function BubbleMap(data){
       .on("mouseleave", mouseleave)
 
   // Add legend: circles
-  var valuesToShow = [1000, 3000, 6000]
+  var valuesToShow = [10, 100, 650]
   var xCircle = 30
   var xLabel = 70
   var yCircle = 400
