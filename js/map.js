@@ -2,7 +2,7 @@ const widthMap = 550, heightMap = 550;
 const path = d3.geoPath();
 const projection = d3.geoConicConformal()
   .center([2.454071, 46.279229])
-  .scale(2600)
+  .scale(2800)
   .translate([widthMap / 2, heightMap / 2]);
 
 path.projection(projection);
