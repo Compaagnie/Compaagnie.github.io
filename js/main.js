@@ -268,6 +268,9 @@ function detail_bar_mouseclick(event, d)
 	var color = "#a8dadc";
 	if(event.shiftKey) color = newRandomColor;
 
+  // il faudrait l'ajouter correctement, peut être dans le join/update/exit
+  addSelectPropertyTooltip({name:detailBarChartOrder[d],color:color});
+
 	// create circles for each BW corresponding to its area
 	circles.selectAll("circle")
 		.data(map_filtered, d => d.idSite)
@@ -335,6 +338,41 @@ var Tooltip_Bars = d3.select("#chart-contain")
 .style("border-radius", "5px")
 .style("padding", "5px");
 
+var Tooltip_Select_Property = d3.select("#map")
+.append("div")
+.attr("class", "tooltip")
+.attr("id", "PropertySelection")
+.style("opacity", 1)
+.style("background-color", "white")
+.style("border", "solid")
+.style("border-width", "2px")
+.style("border-radius", "5px")
+.style("padding", "5px");
+
+var addSelectPropertyTooltip = function(d){
+  var tooltip = d3.select("#PropertySelection")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 1)
+    .style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "2px")
+    .style("border-radius", "5px")
+    .style("padding", "5px");
+  tooltip.html(d.name);
+  tooltip.append("svg")
+    .attr("width", 30)
+    .attr("height", 20)
+    .attr("viewBox", [0, 0, 30, 20])
+    .append("circle")
+    .attr("cx",10)
+    .attr("cy",10)
+    .attr("r",10)
+    .attr("fill",d.color)
+    .attr("stroke-width", 1)
+    .attr("stroke", "#219ebc")
+    .attr("fill-opacity", .4);
+}
 // Three function that change the tooltip when user hover / move / leave a cell
 var bar_mouseover = function(event, d) {
   Tooltip_Bars.style("opacity", 1);

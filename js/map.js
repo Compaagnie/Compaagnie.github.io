@@ -10,9 +10,11 @@ path.projection(projection);
 const svgMap = d3.select('#map').append("svg")
   .attr("id", "svg")
   .attr("width", widthMap)
-  .attr("height", heightMap)
-  ;
+  .attr("height", heightMap);
 
+var content = document.getElementById('svg');
+var parent = content.parentNode;
+parent.insertBefore(content, parent.firstChild);
 	
 let zoom = d3.zoom()
    .scaleExtent([1, 3])
@@ -176,7 +178,7 @@ var addFocusLegend = function(d){
 
 // create a tooltip
 
-Tooltip = d3.select("#map")
+Tooltip = d3.select("#map-contain")
 .append("div")
 .attr("class", "tooltip")
 .style("opacity", 0)
