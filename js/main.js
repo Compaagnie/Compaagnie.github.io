@@ -108,48 +108,57 @@ var createChart = function(){
   document.getElementById(placeForOverallBarChart).append(overallBarChart);
 }
 
-var selected_polluants = new Set();
+var selected_polluants = [];
 var current_circle_color = 0;
-var site_ids = [];
 
 // function used to filter on polluant for the map
 function bar_mouseclick(event, d)
 {
 	// manage selection
-	if(selected_polluants.has(d.data[0])) // if already selected
+	const idx = selected_polluants.indexOf(d.data[0]);
+	if(idx != -1) // if already selected
 	{
-		// remove only this elem
-		if(event.shiftKey) selected_polluants.delete(d.data[0])
-		// remove all elems
-		else selected_polluants = new Set();
+		if(!event.shiftKey) selected_polluants = [];// clear
+		else selected_polluants.splice(idx, 1); // remove only this element
 	}
 	else // if not selected
 	{
-		// add to selection
-		if(event.shiftKey) selected_polluants.add(d.data[0])
-		// se as selection
-		else selected_polluants = new Set([d.data[0]]);
+		// set as selection
+		if(!event.shiftKey) selected_polluants = [d.data[0]];
+		else 
+		{
+			// add to selection
+			// remove first selected if already 2 are selected 
+			if(selected_polluants.length > 1) selected_polluants.shift(); 
+			selected_polluants.push(d.data[0]); 
+		}
 	}
 
-	// get all sites corresponding to all "polluants"
-	const all_sites_arrays = Array.from(selected_polluants).map(v => idSite_eachPolluants.get(v));
-	// concatenante all found site arrays into one big array
-	const all_sites = ([]).concat(...all_sites_arrays);
+	var map_filtered;
 
-	// console.log("All sites arrays:", all_sites_arrays);
-	// console.log("All sites :", all_sites);
+	// if no selection : default (all)
+	if(selected_polluants.length == 0) map_filtered = usableDataForMap;
+	else // only selection
+	{
+		console.log(selected_polluants);
 
-	// filter the map data to gather only the corresponding BW
-	var map_filtered = usableDataForMap.filter(
-		function(d)
-		{
-			return all_sites.find(m => m == d.idSite);
-		}
-	);
-
-
-	// if no polluant is selected, go back to default (all BW)
-	if(all_sites.length == 0) map_filtered = usableDataForMap;
+		// get site arrays corresponding to "polluants"
+		const site_arrays = selected_polluants.map(v => idSite_eachPolluants.get(v));
+		
+		// create intersection of array(s) if 2 are present in selection
+		var inter_sites = site_arrays[0];
+		if(site_arrays.length > 1) inter_sites = inter_sites.filter(v => (site_arrays[1]).includes(v))
+		
+		// const all_sites = ([]).concat(...all_sites_arrays);
+	
+		// filter the map data to gather only the corresponding BW
+		var map_filtered = usableDataForMap.filter(
+			function(d)
+			{
+				return inter_sites.find(m => m == d.idSite);
+			}
+		);
+	}
 
 	// function to have a liner size for the radius of the circles
 	var size = d3.scaleLinear()
@@ -158,11 +167,11 @@ function bar_mouseclick(event, d)
 
 	
 	// const newRandomColor = "#" + Math.floor(Math.random()*16777215).toString(16);
-	const newRandomColor = d3.schemeTableau10[current_circle_color++%d3.schemeTableau10.length]
-	const bothRandomColor = "#" + Math.floor(Math.random()*16777215).toString(16);
+	// const newRandomColor = d3.schemeTableau10[current_circle_color++%d3.schemeTableau10.length]
+	// const bothRandomColor = "#" + Math.floor(Math.random()*16777215).toString(16);
 	
-	var color = "#a8dadc";
-	if(event.shiftKey) color = newRandomColor;
+	// var color = "#a8dadc";
+	// if(event.shiftKey) color = newRandomColor;
 
 	// create circles for each BW corresponding to its area
 	circles.selectAll("circle")
@@ -178,7 +187,7 @@ function bar_mouseclick(event, d)
 					.attr("stroke-width", 1)
 					.attr("stroke", "#219ebc")
 					.attr("fill-opacity", .4)
-					.attr("fill", color)
+					.attr("fill", "#a8dadc")
 					.on("mouseover", map_mouseover)
 					.on("mousemove", map_mousemove)
 					.on("mouseleave", map_mouseleave)
@@ -188,32 +197,13 @@ function bar_mouseclick(event, d)
 			,
 			update => 
 			{
-				if(!event.shiftKey) update.attr("fill", color);
-				else 
-				{
-					update
-					.attr("fill-opacity", .2)
-					.append("circle")
-					.attr("cx", function(d){ return projection([d.lon, d.lat])[0] })
-					.attr("cy", function(d){ return projection([d.lon, d.lat])[1] })
-					.attr("r", function(d){ return size(Math.sqrt(d.area/Math.PI)) })
-					.attr("stroke-width", 1)
-					.attr("stroke", "#219ebc")
-					.attr("fill-opacity", .2)
-					.attr("fill", bothRandomColor)
-					.on("mouseover", map_mouseover)
-					.on("mousemove", map_mousemove)
-					.on("mouseleave", map_mouseleave)
-					.on("click", map_mouseclick);
-				}
-				// update.attr("fill", bothRandomColor);
+				//console.log(update);
 			}
 			,
 			exit =>
 			{
 				// console.log(exit);
-				if(!event.shiftKey) exit.remove();
-				
+				exit.remove();
 			}
 		)
 	
@@ -301,7 +291,7 @@ function StackedBarChart(data, {
         .offset(offset)
       (d3.rollup(I, ([i]) => i, i => X[i], i => Z[i]))
       .map(s => s.map(d => Object.assign(d, {i: d.data[1].get(s.key)})));
-      console.log(series);
+      // console.log(series);
   
     // Compute the default y-domain. Note: diverging stacks can be negative.
     if (yDomain === undefined) yDomain = d3.extent(series.flat(2));
