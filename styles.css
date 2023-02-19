@@ -11659,7 +11659,10 @@ textarea.form-control-lg {
 }
 
 #focus {
-  background: rgb(130, 255, 148);
+  text-align: center;
+}
+
+.our_foot{
   text-align: center;
 }
 
