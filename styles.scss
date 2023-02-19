@@ -64,3 +64,29 @@
 #button{
     width:fit-content;
 }
+
+.info{
+    display:grid;
+    grid-template-columns: repeat(2, 3fr);
+    padding-top: 30px;
+}
+
+.txt_left{
+    grid-row: 1/2;
+    text-align: justify;
+    margin: auto;
+}
+
+.img_left{
+    grid-row: 1/2;
+    margin: auto;
+}
+
+.img_right{
+    margin: auto;
+}
+
+.txt_right{
+    text-align: justify;
+    margin: auto;
+}
