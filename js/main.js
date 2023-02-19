@@ -64,22 +64,10 @@ d3.csv("../data/waterBodiesData.csv", d3.autotype).then(function(data){
 	byWaterBodyIdentifier = d3.group(usableDataForBars, function(d){return(d.monitoringSiteIdentifier)});
 
   xScaleFix = usableDataForBars.filter(function(d){
+    d.resultMeanValue = parseFloat(d.resultMeanValue);
     return (d.resultUom.match(/mg/i) && totalByProperty.get(d.observedPropertyDeterminandLabel) > 100 && totalByProperty.get(d.observedPropertyDeterminandLabel) < 80000 );
   });
   sortByPropertyName = d3.groupSort(xScaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);  
-  detailBarChart = StackedBarChart([], {
-    x: d => d.observedPropertyDeterminandLabel,
-    y: d => d.resultMeanValue,
-    z: d => d.monitoringSiteIdentifier,
-    xDomain: sortByPropertyName,
-    yLabel: "↑ Quantity (mg/L)",
-    yRange: 1000,
-    //zDomain: waterBodyIdentifier,
-    colors: d3.schemeSpectral[totalByProperty.length],
-    width: width,
-    height: height
-  });
-  document.getElementById("focus").append(detailBarChart);
   Legend = d3.select("#focus")
   .append("div")
   .attr("id", "detailBarTooltip")
@@ -391,7 +379,7 @@ function GroupedBarChart(data, {
   title, // given d in data, returns the title text
   marginTop = 30, // top margin, in pixels
   marginRight = 0, // right margin, in pixels
-  marginBottom = 30, // bottom margin, in pixels
+  marginBottom = 300, // bottom margin, in pixels
   marginLeft = 40, // left margin, in pixels
   width = 640, // outer width, in pixels
   height = 400, // outer height, in pixels
@@ -419,6 +407,7 @@ function GroupedBarChart(data, {
   xDomain = new d3.InternSet(xDomain);
   zDomain = new d3.InternSet(zDomain);
   console.log(Y);
+  console.log(d3.max(Y));
   console.log(yDomain);
   // Omit any data not present in both the x- and z-domain.
   const I = d3.range(X.length).filter(i => xDomain.has(X[i]) && zDomain.has(Z[i]));
