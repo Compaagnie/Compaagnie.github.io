@@ -81,7 +81,7 @@ function map_mouseclick(event, d)
 	if(event.shiftKey) map_selection.push(d.idBW);
 	else map_selection = [d.idBW];
 
-	console.log(map_selection);
+	console.log("Map selection :", map_selection);
 
 	// Get filtered idBW
 	const filtered_bw = usableDataForMap_notunique.filter(
@@ -90,23 +90,45 @@ function map_mouseclick(event, d)
 			return map_selection.find(m => m == d.idBW);
 	});
 
-	// Get sites corresponding to those
-	const filtered_sites = filtered_bw.map((m) => [m.idSite]);
+	// // Get sites corresponding to those
+	// const filtered_sites = filtered_bw.map((m) => [{idSite:m.idSite, idBW:m.idBW}]);
 	
-	console.log(filtered_sites);
+	// console.log("Filtered sites:", filtered_sites);
 	
 	// Filter the bar_chart data to match only the identifiers
-	const filtered_bars = usableDataForBars.filter(
+	const filtered_bars = xScaleFix.filter(
 		function(d)
-		{ 
-			// console.log(d.monitoringSiteIdentifier);
-			return filtered_sites.find(s => s == d.monitoringSiteIdentifier);
+		{
+
+			const bw = filtered_bw.find((bw) => bw.idSite == d.monitoringSiteIdentifier)
+			if(bw) 
+			{
+				d.idBW = bw.idBW;
+				console.log(d.idBW);
+			}
+			return bw != undefined;
 		});
 	
-	console.log(filtered_bars);
 
-	// var new_bar_chart = create_bar_chart_from_data(filtered_bars);
-	// document.getElementById(placeForBarChart).append(new_bar_chart);
+	const new_sort_by_name = d3.groupSort(filtered_bars, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
+	
+	console.log("Filtered bars:", filtered_bars);
+
+	detailBarChart = StackedBarChart(filtered_bars, 
+	{
+    x: d => d.observedPropertyDeterminandLabel,
+    y: d => d.resultMeanValue,
+    z: d => d.idBW,
+    xDomain: new_sort_by_name, // only name the present elements
+    yLabel: "↑ Quantity (mg/L)",
+    // yRange: 1000,
+    //zDomain: waterBodyIdentifier,
+    colors: d3.schemeSpectral[totalByProperty.length],
+    width: width,
+    height: height
+  });
+
+  document.getElementById(placeForDetailBarChart).replaceChildren(detailBarChart);
 }
 
 

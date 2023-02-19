@@ -219,6 +219,7 @@ function StackedBarChart(data, {
 
   
     const bar = svg.append("g")
+		.classed("series", true)
     .selectAll("g")
     .data(series)
     .join("g")
