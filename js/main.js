@@ -230,19 +230,21 @@ var Tooltip_Bars = d3.select("#chart-contain")
 .style("border", "solid")
 .style("border-width", "2px")
 .style("border-radius", "5px")
-.style("padding", "5px")
+.style("padding", "5px");
 
 // Three function that change the tooltip when user hover / move / leave a cell
 var bar_mouseover = function(event, d) {
-Tooltip_Bars.style("opacity", 1)
+  Tooltip_Bars.style("opacity", 1);
 }
 var bar_mousemove = function(event, d) {
-// console.log(d.data[0]);
-Tooltip_Bars
-.html(descri.find(element => element.pollutant == d.data[0]).descri)
+  // console.log(d.data[0]);
+  Tooltip_Bars
+  .html(descri.find(element => element.pollutant == d.data[0]).descri)
+  .style("left", (event.x)/2 + "px")
+  .style("top", (event.y)/2 + "px");
 }
 var bar_mouseleave = function(event, d) {
-Tooltip_Bars.style("opacity", 0)
+  Tooltip_Bars.style("opacity", 0);
 }
 
 // Copyright 2021 Observable, Inc.
