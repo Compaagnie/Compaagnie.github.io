@@ -52,6 +52,11 @@ var byWaterBodyIdentifier;
 var idSite_eachPolluants;
 var xScaleFix, sortByPropertyName;
 
+var detailBarChartOrder
+var set_bars_order = function(data){
+  detailBarChartOrder = d3.map(data, d => d);
+  detailBarChartOrder = detailBarChartOrder.reverse();
+}
 var overallBarChart;
 var detailBarChart;
 var Legend;
@@ -209,6 +214,8 @@ function bar_mouseclick(event, d)
 	// BubbleMap(map_filtered);
 }
 
+	// BubbleMap(map_filtered);
+}
 // create a tooltip
 var Tooltip_Bars = d3.select("#chart-contain")
 .append("div")
@@ -225,7 +232,6 @@ var bar_mouseover = function(event, d) {
   Tooltip_Bars.style("opacity", 1);
 }
 var bar_mousemove = function(event, d) {
-  // console.log(d.data[0]);
   Tooltip_Bars
   .html(descri.find(element => element.pollutant == d.data[0]).descri)
   .style("left", (event.x)/2 + "px")
@@ -233,6 +239,12 @@ var bar_mousemove = function(event, d) {
 }
 var bar_mouseleave = function(event, d) {
   Tooltip_Bars.style("opacity", 0);
+}
+var detail_bar_mousemove = function(event, d) {
+  Tooltip_Bars
+  .html(descri.find(element => element.pollutant == detailBarChartOrder[d]).descri)
+  .style("left", (event.x)/2 + "px")
+  .style("top", (event.y)/2 + "px");
 }
 
 // Copyright 2021 Observable, Inc.
@@ -406,9 +418,7 @@ function GroupedBarChart(data, {
   if (zDomain === undefined) zDomain = Z;
   xDomain = new d3.InternSet(xDomain);
   zDomain = new d3.InternSet(zDomain);
-  console.log(Y);
-  console.log(d3.max(Y));
-  console.log(yDomain);
+  console.log(xDomain);
   // Omit any data not present in both the x- and z-domain.
   const I = d3.range(X.length).filter(i => xDomain.has(X[i]) && zDomain.has(Z[i]));
 
@@ -458,11 +468,15 @@ function GroupedBarChart(data, {
       .attr("y", i => yScale(Y[i]))
       .attr("width", xzScale.bandwidth())
       .attr("height", i => yScale(0) - yScale(Y[i]))
-      .attr("fill", i => zScale(Z[i]));
-
+      .attr("fill", i => zScale(Z[i]))
+    .on("mouseover", bar_mouseover)
+    .on("mousemove", detail_bar_mousemove)
+    .on("mouseleave", bar_mouseleave);
+    
+  bar.on("click", detail_bar_mouseclick);
   if (title) bar.append("title")
-      .text(title);
-
+    .text(title);
+      
   const xGroup = svg.append("g")
   .style("font-size", "1em")
   .attr("transform", `translate(0,${yScale(0)})`)

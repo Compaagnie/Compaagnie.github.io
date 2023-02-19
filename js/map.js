@@ -120,7 +120,7 @@ function map_mouseclick(event, d)
 	
 
 	const new_sort_by_name = d3.groupSort(filtered_bars, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
-	
+	set_bars_order(new_sort_by_name);
 	console.log("Filtered bars:", filtered_bars);
 
 	// detailBarChart = StackedBarChart(filtered_bars, 
