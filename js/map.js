@@ -164,20 +164,6 @@ function BubbleMap(data){
     .style("border-radius", "5px")
     .style("padding", "5px")
 
-    // Three function that change the tooltip when user hover / move / leave a cell
-  var mouseover = function(event, d) {
-    Tooltip.style("opacity", 1)
-  }
-  var mousemove = function(event, d) {
-    Tooltip
-      .html(d.name + "<br>" + "area: " + d.area + " km2 <br> id: " + d.idBW)
-      .style("left", (event.x)/2 + "px")
-      .style("top", (event.y)/2 + "px")
-  }
-  var mouseleave = function(event, d) {
-    Tooltip.style("opacity", 0)
-  }
-
   var size = d3.scaleLinear()
       .domain([0,20])  // What's in the data
       .range([ 1, 15]);
