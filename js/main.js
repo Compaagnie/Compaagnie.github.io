@@ -1,10 +1,45 @@
 const placeForDetailBarChart = "focus";
 const placeForOverallBarChart = "overallChart";
 
+var descri = [
+  {pollutant: "Hardness", descri: "Water hardness is a traditional measure of the capacity of water to react with soap. Hard water requires a considerable amount of soap to produce a lather. Water supplies with a hardness greater than 200 mg/L are considered poor but have been tolerated by consumers; those in excess of 500 mg/L are unacceptable for most domestic purposes."},
+  {pollutant: "Hydrogen Carbonate (Bicarbonate) HCO3", descri: ""},
+  {pollutant: "Calcium", descri: "There is no evidence of adverse health effects specifically attributable to calcium in drinking water. It contributes to the hardness of water."},
+  {pollutant: "Sulphate", descri: ""},
+  {pollutant: "Chloride", descri: "An aesthetic objective of ≤250 mg/L has been established for chloride in drinking water. At concentrations above the aesthetic objective, chloride imparts undesirable tastes to water and may cause corrosion in the distribution system."},
+  {pollutant: "Total suspended solids", descri: "Total dissolved solids comprise inorganic salts and small amounts of organic matter that are dissolved in water. An aesthetic objective of ≤500 mg/L has been established for total dissolved solids in drinking water. At higher levels, excessive hardness, unpalatability, mineral deposition and corrosion may occur."},
+  {pollutant: "Sodium", descri: ""},
+  {pollutant: "Nitrate", descri: "The maximum acceptable concentration for nitrate in drinking water is 45 mg/L. Larger quantities may lead to methemoglobinemia."},
+  {pollutant: "Dissolved oxygen", descri: ""},
+  {pollutant: "CODCr", descri: ""},
+  {pollutant: "Magnesium", descri: "There is no evidence of adverse health effects specifically attributable to magnesium in drinking water. A guideline for magnesium has therefore not been specified. Magnesium is a major contributor to water hardness. Magnesium is an essential element in human metabolism."},
+  {pollutant: "Total nitrogen", descri: ""},
+  {pollutant: "Silicate", descri: ""},
+  {pollutant: "Total inorganic nitrogen", descri: ""},
+  {pollutant: "Total oxidised nitrogen", descri: ""},
+  {pollutant: "Potassium", descri: ""},
+  {pollutant: "Dissolved organic carbon (DOC)", descri: ""},
+  {pollutant: "BOD5", descri: ""},
+  {pollutant: "Total organic carbon (TOC)", descri: ""},
+  {pollutant: "Kjeldahl nitrogen", descri: ""},
+  {pollutant: "Total organic nitrogen", descri: ""},
+  {pollutant: "Ammonium", descri: ""},
+  {pollutant: "Fluorine", descri: ""},
+  {pollutant: "Uranium", descri: "The guideline value of World Health Organization is 30 µg/L for uranium. As of 2018, the European Union has not established a drinking water value for natural uranium. There isn’t enough evidence to conclude that natural uranium in drinking water will cause cancer in humans. However, chronic exposure may affect the kidney."},
+  {pollutant: "Total phosphorus", descri: ""},
+  {pollutant: "Nitrite", descri: "The maximum acceptable concentration for nitrite in drinking water is 3 mg/L. Larger quantities may lead to methemoglobinemia.”"},
+  {pollutant: "Phosphate", descri: ""},
+  {pollutant: "Iron and its compounds", descri: "The aesthetic objective for iron in drinking water is ≤0.3mg/L. Iron, an essential element in human nutrition. Iron is an essential element in human metabolism."}
+];
+
+
+
 // set the dimensions and margins of the graph
 var margin = {top: 30, right: 30, bottom: 70, left: 60},
     width = 550,
     height = 550;
+
+
 
 // all the data
 var usableDataForBars; 
@@ -45,6 +80,7 @@ d3.csv("../data/waterBodiesData.csv", d3.autotype).then(function(data){
     height: height
   });
   document.getElementById(placeForDetailBarChart).append(detailBarChart);
+ 
 })
 
 
@@ -230,6 +266,7 @@ function StackedBarChart(data, {
         .offset(offset)
       (d3.rollup(I, ([i]) => i, i => X[i], i => Z[i]))
       .map(s => s.map(d => Object.assign(d, {i: d.data[1].get(s.key)})));
+      console.log(series);
   
     // Compute the default y-domain. Note: diverging stacks can be negative.
     if (yDomain === undefined) yDomain = d3.extent(series.flat(2));
@@ -270,8 +307,32 @@ function StackedBarChart(data, {
             .attr("y", 10)
             .attr("fill", "currentColor")
             .attr("text-anchor", "start")
-            .text(yLabel));
+            .text(yLabel))
+        
 
+    // create a tooltip
+    var Tooltip_Bars = d3.select("#chart-contain")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0)
+      .style("background-color", "white")
+      .style("border", "solid")
+      .style("border-width", "2px")
+      .style("border-radius", "5px")
+      .style("padding", "5px")
+
+    // Three function that change the tooltip when user hover / move / leave a cell
+    var bar_mouseover = function(event, d) {
+      Tooltip_Bars.style("opacity", 1)
+    }
+    var bar_mousemove = function(event, d) {
+      console.log(d.data[0]);
+      Tooltip_Bars
+      .html(descri.find(element => element.pollutant == d.data[0]).descri)
+    }
+    var bar_mouseleave = function(event, d) {
+    Tooltip_Bars.style("opacity", 0)
+    }
   
     const bar = svg.append("g")
 		.classed("series", true)
@@ -286,6 +347,9 @@ function StackedBarChart(data, {
         .attr("y", ([y1, y2]) => Math.min(yScale(y1), yScale(y2)))
         .attr("height", ([y1, y2]) => Math.abs(yScale(y1) - yScale(y2)))
         .attr("width", xScale.bandwidth())
+      .on("mouseover", bar_mouseover)
+      .on("mousemove", bar_mousemove)
+      .on("mouseleave", bar_mouseleave);
 				
   
     if (title) bar.append("title")

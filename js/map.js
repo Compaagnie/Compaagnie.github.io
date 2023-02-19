@@ -131,7 +131,16 @@ function map_mouseclick(event, d)
   document.getElementById(placeForDetailBarChart).replaceChildren(detailBarChart);
 }
 
-
+ // create a tooltip
+ var Tooltip = d3.select("#map")
+ .append("div")
+ .attr("class", "tooltip")
+ .style("opacity", 0)
+ .style("background-color", "white")
+ .style("border", "solid")
+ .style("border-width", "2px")
+ .style("border-radius", "5px")
+ .style("padding", "5px")
 // Three function that change the tooltip
 // when user hover / move / leave a cell
 function map_mouseover(event, d) 
@@ -153,16 +162,7 @@ function map_mouseleave(event, d) {
 
 function BubbleMap(data){
 
-  // create a tooltip
-  Tooltip = d3.select("#map")
-    .append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0)
-    .style("background-color", "white")
-    .style("border", "solid")
-    .style("border-width", "2px")
-    .style("border-radius", "5px")
-    .style("padding", "5px")
+ 
 
   var size = d3.scaleLinear()
       .domain([0,20])  // What's in the data
