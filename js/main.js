@@ -213,6 +213,112 @@ function bar_mouseclick(event, d)
 
 	// BubbleMap(map_filtered);
 }
+// function used to filter on polluant for the map
+function detail_bar_mouseclick(event, d)
+{
+  console.log(d);
+	// manage selection
+	if(selected_polluants.has(detailBarChartOrder[d])) // if already selected
+	{
+		// remove only this elem
+		if(event.shiftKey) selected_polluants.delete(detailBarChartOrder[d])
+		// remove all elems
+		else selected_polluants = new Set();
+	}
+	else // if not selected
+	{
+		// add to selection
+		if(event.shiftKey) selected_polluants.add(detailBarChartOrder[d])
+		// se as selection
+		else selected_polluants = new Set([detailBarChartOrder[d]]);
+	}
+
+	// get all sites corresponding to all "polluants"
+	const all_sites_arrays = Array.from(selected_polluants).map(v => idSite_eachPolluants.get(v));
+	// concatenante all found site arrays into one big array
+	const all_sites = ([]).concat(...all_sites_arrays);
+
+	// console.log("All sites arrays:", all_sites_arrays);
+	// console.log("All sites :", all_sites);
+
+	// filter the map data to gather only the corresponding BW
+	var map_filtered = usableDataForMap.filter(
+		function(d)
+		{
+			return all_sites.find(m => m == d.idSite);
+		}
+	);
+
+
+	// if no polluant is selected, go back to default (all BW)
+	if(all_sites.length == 0) map_filtered = usableDataForMap;
+
+	// function to have a liner size for the radius of the circles
+	var size = d3.scaleLinear()
+      .domain([0,50])  // What's in the data
+      .range([1, 15]);
+
+	
+	// const newRandomColor = "#" + Math.floor(Math.random()*16777215).toString(16);
+	const newRandomColor = d3.schemeTableau10[current_circle_color++%d3.schemeTableau10.length]
+	const bothRandomColor = "#" + Math.floor(Math.random()*16777215).toString(16);
+	
+	var color = "#a8dadc";
+	if(event.shiftKey) color = newRandomColor;
+
+	// create circles for each BW corresponding to its area
+	circles.selectAll("circle")
+		.data(map_filtered, d => d.idSite)
+		.join(
+			enter =>
+			{
+				enter
+					.append("circle")
+					.attr("cx", function(d){ return projection([d.lon, d.lat])[0] })
+					.attr("cy", function(d){ return projection([d.lon, d.lat])[1] })
+					.attr("r", function(d){ return size(Math.sqrt(d.area/Math.PI)) })
+					.attr("stroke-width", 1)
+					.attr("stroke", "#219ebc")
+					.attr("fill-opacity", .4)
+					.attr("fill", color)
+					.on("mouseover", map_mouseover)
+					.on("mousemove", map_mousemove)
+					.on("mouseleave", map_mouseleave)
+					.on("click", map_mouseclick);
+				// console.log(enter);
+			}
+			,
+			update => 
+			{
+				if(!event.shiftKey) update.attr("fill", color);
+				else 
+				{
+					update
+					.attr("fill-opacity", .2)
+					.append("circle")
+					.attr("cx", function(d){ return projection([d.lon, d.lat])[0] })
+					.attr("cy", function(d){ return projection([d.lon, d.lat])[1] })
+					.attr("r", function(d){ return size(Math.sqrt(d.area/Math.PI)) })
+					.attr("stroke-width", 1)
+					.attr("stroke", "#219ebc")
+					.attr("fill-opacity", .2)
+					.attr("fill", bothRandomColor)
+					.on("mouseover", map_mouseover)
+					.on("mousemove", map_mousemove)
+					.on("mouseleave", map_mouseleave)
+					.on("click", map_mouseclick);
+				}
+				// update.attr("fill", bothRandomColor);
+			}
+			,
+			exit =>
+			{
+				// console.log(exit);
+				if(!event.shiftKey) exit.remove();
+				
+			}
+		)
+	
 
 	// BubbleMap(map_filtered);
 }
