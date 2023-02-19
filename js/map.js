@@ -79,8 +79,10 @@ function map_mouseclick(event, d)
 {	
 	// add to array or change array depending on click
 	if(event.shiftKey){
-    map_selection.push(d.idBW);
-    addFocusLegend(d);
+    if (!map_selection.includes(d.idBW)){  
+      map_selection.push(d.idBW);
+      addFocusLegend(d);
+    }
   } 
 	else {
     map_selection = [d.idBW];
@@ -118,24 +120,11 @@ function map_mouseclick(event, d)
 	
 
 	const new_sort_by_name = d3.groupSort(filtered_bars, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
-	
+	set_bars_order(new_sort_by_name);
 	console.log("Filtered bars:", filtered_bars);
 
-	detailBarChart = StackedBarChart(filtered_bars, 
-	{
-    x: d => d.observedPropertyDeterminandLabel,
-    y: d => d.resultMeanValue,
-    z: d => d.idBW,
-    xDomain: new_sort_by_name, // only name the present elements
-    yLabel: "↑ Quantity (mg/L)",
-    // yRange: 1000,
-    //zDomain: waterBodyIdentifier,
-    colors: d3.schemeSpectral[totalByProperty.length],
-    width: width,
-    height: height
-  });
-
-  // detailBarChart = GroupedBarChart(filtered_bars, {
+	// detailBarChart = StackedBarChart(filtered_bars, 
+	// {
   //   x: d => d.observedPropertyDeterminandLabel,
   //   y: d => d.resultMeanValue,
   //   z: d => d.idBW,
@@ -147,6 +136,19 @@ function map_mouseclick(event, d)
   //   width: width,
   //   height: height
   // });
+
+  detailBarChart = GroupedBarChart(filtered_bars, {
+    x: d => d.observedPropertyDeterminandLabel,
+    y: d => d.resultMeanValue,
+    z: d => d.idBW,
+    xDomain: new_sort_by_name, // only name the present elements
+    yLabel: "↑ Quantity (mg/L)",
+    // yRange: 1000,
+    //zDomain: waterBodyIdentifier,
+    colors: d3.schemeSpectral[totalByProperty.length],
+    width: width,
+    height: height
+  });
   document.getElementById(placeForDetailBarChart).replaceChildren(detailBarChart,...Legend);
 }
 
