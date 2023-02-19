@@ -1,12 +1,10 @@
-const placeForBarChart = "focus";
-
-const sizeX = 400;
-const sizeY = 379;
+const placeForDetailBarChart = "focus";
+const placeForOverallBarChart = "overallChart";
 
 // set the dimensions and margins of the graph
 var margin = {top: 30, right: 30, bottom: 70, left: 60},
-    width = 460 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+    width = 550,
+    height = 550;
 
 // all the data
 var usableDataForBars; 
@@ -15,41 +13,51 @@ var totalByProperty;
 // grouped by waterBodyIdentifier
 var byWaterBodyIdentifier;
 var xScaleFix, sortByPropertyName;
-var barChart;
+var overallBarChart;
+var detailBarChart;
+
+d3.csv("../data/waterBodiesData.csv", d3.autotype).then(function(data){
+  usableDataForBars = data;
+
+  totalByProperty = d3.rollup(usableDataForBars, v => d3.sum(v, d => d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
+  byWaterBodyIdentifier = d3.group(usableDataForBars, function(d){return(d.monitoringSiteIdentifier)});
+  console.log(byWaterBodyIdentifier);
+
+  xScaleFix = usableDataForBars.filter(function(d){
+    return (d.resultUom.match(/mg/i) && totalByProperty.get(d.observedPropertyDeterminandLabel) > 100 /*&& totalByProperty.get(d.observedPropertyDeterminandLabel) < 8000*/ );
+  });
+  sortByPropertyName = d3.groupSort(xScaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
+  
+  detailBarChart = StackedBarChart([], {
+    x: d => d.observedPropertyDeterminandLabel,
+    y: d => d.resultMeanValue,
+    z: d => d.monitoringSiteIdentifier,
+    xDomain: sortByPropertyName,
+    yLabel: "↑ Quantity (mg/L)",
+    yRange: 1000,
+    //zDomain: waterBodyIdentifier,
+    colors: d3.schemeSpectral[totalByProperty.length],
+    width: width,
+    height: height
+  });
+  document.getElementById(placeForDetailBarChart).append(detailBarChart);
+})
 
 
 var createChart = function(){
-  if (usableDataForBars == undefined){
-    d3.csv("../data/waterBodiesData.csv", d3.autotype).then(function(data){
-      usableDataForBars = data;
-
-      totalByProperty = d3.rollup(usableDataForBars, v => d3.sum(v, d => d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
-      byWaterBodyIdentifier = d3.group(usableDataForBars, function(d){return(d.monitoringSiteIdentifier)});
-      console.log(byWaterBodyIdentifier);
-
-      xScaleFix = usableDataForBars.filter(function(d){
-        return (totalByProperty.get(d.observedPropertyDeterminandLabel) > 100 && totalByProperty.get(d.observedPropertyDeterminandLabel) < 8000 );
-      });
-      sortByPropertyName = d3.groupSort(xScaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
-    })
-    
-  } else {
-    barChart = StackedBarChart(xScaleFix, {
-      x: d => d.observedPropertyDeterminandLabel,
-      y: d => d.resultMeanValue,
-      z: d => d.monitoringSiteIdentifier,
-      xDomain: sortByPropertyName,
-      yLabel: "↑ Quantity (mg/L)",
-      //zDomain: waterBodyIdentifier,
-      colors: d3.schemeSpectral[totalByProperty.length],
-      width: 1500,
-      height: 1000
-    });
-    document.getElementById(placeForBarChart).append(barChart);
-  }
+  overallBarChart = StackedBarChart(xScaleFix, {
+    x: d => d.observedPropertyDeterminandLabel,
+    y: d => d.resultMeanValue,
+    z: d => d.monitoringSiteIdentifier,
+    xDomain: sortByPropertyName,
+    yLabel: "↑ Quantity (mg/L)",
+    //zDomain: waterBodyIdentifier,
+    colors: d3.schemeSpectral[totalByProperty.length],
+    width: 1500,
+    height: 1000
+  });
+  document.getElementById(placeForOverallBarChart).append(overallBarChart);
 }
-
-createChart();
 
 // function used to filter on polluant for the map
 function bar_mouseclick(event, d)

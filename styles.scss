@@ -33,7 +33,7 @@
     grid-column: 1/2;
     padding: 10px;
     text-align: center;
-    border: solid #000;
+    border: solid #757575;
     overflow: hidden;
 }
 
@@ -49,16 +49,16 @@
 }
 
 #risk{
-    border: solid #000;
+    border: solid #757575;
 }
 
 #focus{
-    background: rgb(130, 255, 148);
     text-align: center;
+    border: solid #757575;
 }
 
-#foot{
-    background: #6096B4;
+.our_foot{
+    text-align: center;
 }
 
 #button{
