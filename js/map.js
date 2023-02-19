@@ -78,8 +78,15 @@ var map_selection = [];
 function map_mouseclick(event, d)
 {	
 	// add to array or change array depending on click
-	if(event.shiftKey) map_selection.push(d.idBW);
-	else map_selection = [d.idBW];
+	if(event.shiftKey){
+    map_selection.push(d.idBW);
+    addFocusLegend(d);
+  } 
+	else {
+    map_selection = [d.idBW];
+    document.getElementById("detailBarTooltip").replaceChildren();
+    addFocusLegend(d);
+  }
 
 	console.log("Map selection :", map_selection);
 
@@ -128,19 +135,48 @@ function map_mouseclick(event, d)
     height: height
   });
 
-  document.getElementById(placeForDetailBarChart).replaceChildren(detailBarChart);
+  // detailBarChart = GroupedBarChart(filtered_bars, {
+  //   x: d => d.observedPropertyDeterminandLabel,
+  //   y: d => d.resultMeanValue,
+  //   z: d => d.idBW,
+  //   xDomain: new_sort_by_name, // only name the present elements
+  //   yLabel: "↑ Quantity (mg/L)",
+  //   // yRange: 1000,
+  //   //zDomain: waterBodyIdentifier,
+  //   colors: d3.schemeSpectral[totalByProperty.length],
+  //   width: width,
+  //   height: height
+  // });
+  document.getElementById(placeForDetailBarChart).replaceChildren(detailBarChart,...Legend);
 }
 
- // create a tooltip
- var Tooltip = d3.select("#map")
- .append("div")
- .attr("class", "tooltip")
- .style("opacity", 0)
- .style("background-color", "white")
- .style("border", "solid")
- .style("border-width", "2px")
- .style("border-radius", "5px")
- .style("padding", "5px")
+
+var addFocusLegend = function(d){
+  var bar_legend = d3.select("#detailBarTooltip")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 1)
+    .style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "2px")
+    .style("border-radius", "5px")
+    .style("padding", "5px")
+		bar_legend.html(d.name + "<br>" + "area: " + d.area + "<br> long: " + d.lon + " lat:  " + d.lat)
+}
+
+
+// create a tooltip
+
+Tooltip = d3.select("#map")
+.append("div")
+.attr("class", "tooltip")
+.style("opacity", 0)
+.style("background-color", "white")
+.style("border", "solid")
+.style("border-width", "2px")
+.style("border-radius", "5px")
+.style("padding", "5px")
+ 
 // Three function that change the tooltip
 // when user hover / move / leave a cell
 function map_mouseover(event, d) 
@@ -161,9 +197,6 @@ function map_mouseleave(event, d) {
 
 
 function BubbleMap(data){
-
- 
-
   var size = d3.scaleLinear()
       .domain([0,20])  // What's in the data
       .range([ 1, 15]);

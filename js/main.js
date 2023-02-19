@@ -54,6 +54,7 @@ var xScaleFix, sortByPropertyName;
 
 var overallBarChart;
 var detailBarChart;
+var Legend;
 
 d3.csv("../data/waterBodiesData.csv", d3.autotype).then(function(data){
   usableDataForBars = data;
@@ -65,8 +66,7 @@ d3.csv("../data/waterBodiesData.csv", d3.autotype).then(function(data){
   xScaleFix = usableDataForBars.filter(function(d){
     return (d.resultUom.match(/mg/i) && totalByProperty.get(d.observedPropertyDeterminandLabel) > 100 /*&& totalByProperty.get(d.observedPropertyDeterminandLabel) < 8000*/ );
   });
-  sortByPropertyName = d3.groupSort(xScaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
-  
+  sortByPropertyName = d3.groupSort(xScaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);  
   detailBarChart = StackedBarChart([], {
     x: d => d.observedPropertyDeterminandLabel,
     y: d => d.resultMeanValue,
@@ -79,8 +79,17 @@ d3.csv("../data/waterBodiesData.csv", d3.autotype).then(function(data){
     width: width,
     height: height
   });
-  document.getElementById(placeForDetailBarChart).append(detailBarChart);
- 
+  document.getElementById("focus").append(detailBarChart);
+  Legend = d3.select("#focus")
+  .append("div")
+  .attr("id", "detailBarTooltip")
+  .style("opacity", 1)
+  .attr("class", "tooltip")
+  .style("background-color", "white")
+  .style("border", "solid")
+  .style("border-width", "2px")
+  .style("border-radius", "5px")
+  .style("padding", "5px");
 })
 
 
@@ -212,6 +221,30 @@ function bar_mouseclick(event, d)
 	// BubbleMap(map_filtered);
 }
 
+// create a tooltip
+var Tooltip_Bars = d3.select("#chart-contain")
+.append("div")
+.attr("class", "tooltip")
+.style("opacity", 0)
+.style("background-color", "white")
+.style("border", "solid")
+.style("border-width", "2px")
+.style("border-radius", "5px")
+.style("padding", "5px")
+
+// Three function that change the tooltip when user hover / move / leave a cell
+var bar_mouseover = function(event, d) {
+Tooltip_Bars.style("opacity", 1)
+}
+var bar_mousemove = function(event, d) {
+// console.log(d.data[0]);
+Tooltip_Bars
+.html(descri.find(element => element.pollutant == d.data[0]).descri)
+}
+var bar_mouseleave = function(event, d) {
+Tooltip_Bars.style("opacity", 0)
+}
+
 // Copyright 2021 Observable, Inc.
 // Released under the ISC license.
 // https://observablehq.com/@d3/stacked-bar-chart
@@ -308,31 +341,6 @@ function StackedBarChart(data, {
             .attr("fill", "currentColor")
             .attr("text-anchor", "start")
             .text(yLabel))
-        
-
-    // create a tooltip
-    var Tooltip_Bars = d3.select("#chart-contain")
-      .append("div")
-      .attr("class", "tooltip")
-      .style("opacity", 0)
-      .style("background-color", "white")
-      .style("border", "solid")
-      .style("border-width", "2px")
-      .style("border-radius", "5px")
-      .style("padding", "5px")
-
-    // Three function that change the tooltip when user hover / move / leave a cell
-    var bar_mouseover = function(event, d) {
-      Tooltip_Bars.style("opacity", 1)
-    }
-    var bar_mousemove = function(event, d) {
-      console.log(d.data[0]);
-      Tooltip_Bars
-      .html(descri.find(element => element.pollutant == d.data[0]).descri)
-    }
-    var bar_mouseleave = function(event, d) {
-    Tooltip_Bars.style("opacity", 0)
-    }
   
     const bar = svg.append("g")
 		.classed("series", true)
@@ -371,5 +379,109 @@ function StackedBarChart(data, {
     return Object.assign(svg.node(), {scales: {color}});
 }
 
+// Copyright 2021 Observable, Inc.
+// Released under the ISC license.
+// https://observablehq.com/@d3/grouped-bar-chart
+function GroupedBarChart(data, {
+  x = (d, i) => i, // given d in data, returns the (ordinal) x-value
+  y = d => d, // given d in data, returns the (quantitative) y-value
+  z = () => 1, // given d in data, returns the (categorical) z-value
+  title, // given d in data, returns the title text
+  marginTop = 30, // top margin, in pixels
+  marginRight = 0, // right margin, in pixels
+  marginBottom = 30, // bottom margin, in pixels
+  marginLeft = 40, // left margin, in pixels
+  width = 640, // outer width, in pixels
+  height = 400, // outer height, in pixels
+  xDomain, // array of x-values
+  xRange = [marginLeft, width - marginRight], // [xmin, xmax]
+  xPadding = 0.1, // amount of x-range to reserve to separate groups
+  yType = d3.scaleLinear, // type of y-scale
+  yDomain, // [ymin, ymax]
+  yRange = [height - marginBottom, marginTop], // [ymin, ymax]
+  zDomain, // array of z-values
+  zPadding = 0.05, // amount of x-range to reserve to separate bars
+  yFormat, // a format specifier string for the y-axis
+  yLabel, // a label for the y-axis
+  colors = d3.schemeTableau10, // array of colors
+} = {}) {
+  // Compute values.
+  const X = d3.map(data, x);
+  const Y = d3.map(data, y);
+  const Z = d3.map(data, z);
 
+  // Compute default domains, and unique the x- and z-domains.
+  if (xDomain === undefined) xDomain = X;
+  if (yDomain === undefined) yDomain = [0, d3.max(Y)];
+  if (zDomain === undefined) zDomain = Z;
+  xDomain = new d3.InternSet(xDomain);
+  zDomain = new d3.InternSet(zDomain);
+  console.log(Y);
+  console.log(yDomain);
+  // Omit any data not present in both the x- and z-domain.
+  const I = d3.range(X.length).filter(i => xDomain.has(X[i]) && zDomain.has(Z[i]));
+
+  // Construct scales, axes, and formats.
+  const xScale = d3.scaleBand(xDomain, xRange).paddingInner(xPadding);
+  const xzScale = d3.scaleBand(zDomain, [0, xScale.bandwidth()]).padding(zPadding);
+  const yScale = yType(yDomain, yRange);
+  const zScale = d3.scaleOrdinal(zDomain, colors);
+  const xAxis = d3.axisBottom(xScale).tickSizeOuter(0);
+  const yAxis = d3.axisLeft(yScale).ticks(height / 60, yFormat);
+
+  // Compute titles.
+  if (title === undefined) {
+    const formatValue = yScale.tickFormat(100, yFormat);
+    title = i => `${X[i]}\n${Z[i]}\n${formatValue(Y[i])}`;
+  } else {
+    const O = d3.map(data, d => d);
+    const T = title;
+    title = i => T(O[i], i, data);
+  }
+
+  const svg = d3.create("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("viewBox", [0, 0, width, height])
+      .attr("style", "max-width: 100%; height: auto; height: intrinsic;");
+
+  svg.append("g")
+      .attr("transform", `translate(${marginLeft},0)`)
+      .call(yAxis)
+      .call(g => g.select(".domain").remove())
+      .call(g => g.selectAll(".tick line").clone()
+          .attr("x2", width - marginLeft - marginRight)
+          .attr("stroke-opacity", 0.1))
+      .call(g => g.append("text")
+          .attr("x", -marginLeft)
+          .attr("y", 10)
+          .attr("fill", "currentColor")
+          .attr("text-anchor", "start")
+          .text(yLabel));
+
+  const bar = svg.append("g")
+    .selectAll("rect")
+    .data(I)
+    .join("rect")
+      .attr("x", i => xScale(X[i]) + xzScale(Z[i]))
+      .attr("y", i => yScale(Y[i]))
+      .attr("width", xzScale.bandwidth())
+      .attr("height", i => yScale(0) - yScale(Y[i]))
+      .attr("fill", i => zScale(Z[i]));
+
+  if (title) bar.append("title")
+      .text(title);
+
+  const xGroup = svg.append("g")
+  .style("font-size", "1em")
+  .attr("transform", `translate(0,${yScale(0)})`)
+  .call(xAxis);
+
+  xGroup.selectAll("text")
+    .style("text-anchor", "end")
+    .attr("dx", "-.8em")
+    .attr("dy", ".15em")
+    .attr("transform", "rotate(-65)");
+  return Object.assign(svg.node(), {scales: {color: zScale}});
+}
 

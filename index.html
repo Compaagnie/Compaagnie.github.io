@@ -25,16 +25,12 @@
       const div = d3.selectAll("div");
 
       </script>
-      <script type="text/javascript" src="js/main.js"></script>
-      <script type="text/javascript" src="js/dataWritting.js"></script>
-      <script type="text/javascript" src="js/interaction.js"></script>
       <!-- <script type="text/javascript" src="./js/interactions.js"></script> -->
-
+      
       <div id="main">
         <div id="map-contain">
           <h2>Water Sources</h2>
           <div id="map">
-            <script type="text/javascript" src="js/map.js"></script>
             <style>
               .circle:hover{
                 stroke: black;
@@ -45,7 +41,7 @@
         </div>
         <div id="chart-contain">
           <h2>Click a source for details</h2>
-          <div id="focus" style="overflow-x: scroll">
+          <div id="focus">
             
           </div>
         </div>
@@ -53,12 +49,16 @@
       <div id="overallChart">
         <button class="btn btn-primary" onclick="createChart()">Overall Bar chart</button>
       </div>
-      <!-- <div id="test">
+      <div id="test">
         <button class="btn btn-primary" onclick="createJSON()">Create Data</button>
-      </div> -->
+      </div>
     </div>
   </body>
-
+  
+  <script type="text/javascript" src="js/main.js"></script>
+  <script type="text/javascript" src="js/dataWritting.js"></script>
+  <script type="text/javascript" src="js/interaction.js"></script>
+  <script type="text/javascript" src="js/map.js"></script>
   <div class="footer">
     <footer class="our_foot border-top">
         <div class="our_foot">Our GitHubs</div> 
