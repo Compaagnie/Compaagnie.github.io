@@ -3,32 +3,32 @@ const placeForOverallBarChart = "overallChart";
 
 var descri = [
   {pollutant: "Hardness", descri: "Water hardness is a traditional measure of the capacity of water to react with soap. Hard water requires a considerable amount of soap to produce a lather. Water supplies with a hardness greater than 200 mg/L are considered poor but have been tolerated by consumers; those in excess of 500 mg/L are unacceptable for most domestic purposes."},
-  {pollutant: "Hydrogen Carbonate (Bicarbonate) HCO3", descri: ""},
+  {pollutant: "Hydrogen Carbonate (Bicarbonate) HCO3", descri: "Bicarbonate (HCO3) is an important component in the human body. Natural mineral or spring waters have different levels of bicarbonates, varying from ten to hundreds of mg/l. Water that has a pH of 7.5 or above is usually associated with high levels of bicarbonates."},
   {pollutant: "Calcium", descri: "There is no evidence of adverse health effects specifically attributable to calcium in drinking water. It contributes to the hardness of water."},
-  {pollutant: "Sulphate", descri: ""},
+  {pollutant: "Sulphate", descri: "There is no health-based guideline value for sulfate in drinking water. However, there is an increasing likelihood of complaints arising from a noticeable taste as concentrations in water increase above 500 mg/litre."},
   {pollutant: "Chloride", descri: "An aesthetic objective of ≤250 mg/L has been established for chloride in drinking water. At concentrations above the aesthetic objective, chloride imparts undesirable tastes to water and may cause corrosion in the distribution system."},
-  {pollutant: "Total suspended solids", descri: "Total dissolved solids comprise inorganic salts and small amounts of organic matter that are dissolved in water. An aesthetic objective of ≤500 mg/L has been established for total dissolved solids in drinking water. At higher levels, excessive hardness, unpalatability, mineral deposition and corrosion may occur."},
-  {pollutant: "Sodium", descri: ""},
+  {pollutant: "Total suspended solids", descri: "Total dissolved solids comprise inorganic salts and small amounts of organic matter that are dissolved in water. An aesthetic objective of under under 500 mg/L has been established for total dissolved solids in drinking water. At higher levels, excessive hardness, unpalatability, mineral deposition and corrosion may occur."},
+  {pollutant: "Sodium", descri: "There is no health-based guideline value for sodium in drinking water. However, sodium may affect the taste of drinking-water at levels above about 200 mg/litre."},
   {pollutant: "Nitrate", descri: "The maximum acceptable concentration for nitrate in drinking water is 45 mg/L. Larger quantities may lead to methemoglobinemia."},
-  {pollutant: "Dissolved oxygen", descri: ""},
-  {pollutant: "CODCr", descri: ""},
+  {pollutant: "Dissolved oxygen", descri: "Dissolved oxygen is the amount of oxygen available to living aquatic organisms. The amount of dissolved oxygen in a water body can tell a lot about its water quality."},
+  {pollutant: "CODCr", descri: "Chemical Oxygen Demand. It is a way of measuring organic matter."},
   {pollutant: "Magnesium", descri: "There is no evidence of adverse health effects specifically attributable to magnesium in drinking water. A guideline for magnesium has therefore not been specified. Magnesium is a major contributor to water hardness. Magnesium is an essential element in human metabolism."},
-  {pollutant: "Total nitrogen", descri: ""},
-  {pollutant: "Silicate", descri: ""},
-  {pollutant: "Total inorganic nitrogen", descri: ""},
-  {pollutant: "Total oxidised nitrogen", descri: ""},
-  {pollutant: "Potassium", descri: ""},
-  {pollutant: "Dissolved organic carbon (DOC)", descri: ""},
-  {pollutant: "BOD5", descri: ""},
-  {pollutant: "Total organic carbon (TOC)", descri: ""},
-  {pollutant: "Kjeldahl nitrogen", descri: ""},
-  {pollutant: "Total organic nitrogen", descri: ""},
-  {pollutant: "Ammonium", descri: ""},
-  {pollutant: "Fluorine", descri: ""},
+  {pollutant: "Total nitrogen", descri: "Nitrogen are essential for plant and animal growth, however excess nitrogen can cause overstimulation of growth of aquatic plants and algae."},
+  {pollutant: "Silicate", descri: "Silicate is a source of food for aquatic life, but can also cause overgrowing of algae."},
+  {pollutant: "Total inorganic nitrogen", descri: "Inorganic nitrogen s nitrogen that occurs in inorganic compounds. Nitrogen are essential for plant and animal growth, however excess nitrogen can cause overstimulation of growth of aquatic plants and algae."},
+  {pollutant: "Total oxidised nitrogen", descri: "Nitrogen are essential for plant and animal growth, however excess nitrogen can cause overstimulation of growth of aquatic plants and algae."},
+  {pollutant: "Potassium", descri: "There is no health-based guideline value for potassium in drinking water. Large quantities can lead to hyperkalemia."},
+  {pollutant: "Dissolved organic carbon (DOC)", descri: "A fraction of organic carbon that through some filters. "},
+  {pollutant: "BOD5", descri: "BOD5 measures the mass of molecular oxygen consumed by micro-organism in 5 days."},
+  {pollutant: "Total organic carbon (TOC)", descri: "Concentration of organic carbon. High TOC levels are not harmful to humans."},
+  {pollutant: "Kjeldahl nitrogen", descri: "A certain type of analysis of nitrogen. Nitrogen are essential for plant and animal growth, however excess nitrogen can cause overstimulation of growth of aquatic plants and algae."},
+  {pollutant: "Total organic nitrogen", descri: "Organic nitrogen s nitrogen that occurs in inorganic compounds. Nitrogen are essential for plant and animal growth, however excess nitrogen can cause overstimulation of growth of aquatic plants and algae."},
+  {pollutant: "Ammonium", descri: "There is no health guideline for ammonium in drinking water."},
+  {pollutant: "Fluorine", descri: "The maximum acceptable concentration for fluoride in drinking water is 1.5 mg/L. Large quantities may lead to skeletal fluorosis."},
   {pollutant: "Uranium", descri: "The guideline value of World Health Organization is 30 µg/L for uranium. As of 2018, the European Union has not established a drinking water value for natural uranium. There isn’t enough evidence to conclude that natural uranium in drinking water will cause cancer in humans. However, chronic exposure may affect the kidney."},
-  {pollutant: "Total phosphorus", descri: ""},
-  {pollutant: "Nitrite", descri: "The maximum acceptable concentration for nitrite in drinking water is 3 mg/L. Larger quantities may lead to methemoglobinemia.”"},
-  {pollutant: "Phosphate", descri: ""},
+  {pollutant: "Total phosphorus", descri: "Phosphorus is essential for plant and animal growth. It is a common constituent of fertilizers. Excess Phosphorus can cause overgrowth of algae."},
+  {pollutant: "Nitrite", descri: "The maximum acceptable concentration for nitrite in drinking water is 3 mg/L. Larger quantities may lead to methemoglobinemia."},
+  {pollutant: "Phosphate", descri: "Excess can lead to overgrowth of algae."},
   {pollutant: "Iron and its compounds", descri: "The aesthetic objective for iron in drinking water is ≤0.3mg/L. Iron, an essential element in human nutrition. Iron is an essential element in human metabolism."}
 ];
 
@@ -59,7 +59,7 @@ d3.csv("../data/waterBodiesData.csv", d3.autotype).then(function(data){
   console.log(byWaterBodyIdentifier);
 
   xScaleFix = usableDataForBars.filter(function(d){
-    return (d.resultUom.match(/mg/i) && totalByProperty.get(d.observedPropertyDeterminandLabel) > 100 /*&& totalByProperty.get(d.observedPropertyDeterminandLabel) < 8000*/ );
+    return (d.resultUom.match(/mg/i) && totalByProperty.get(d.observedPropertyDeterminandLabel) > 100 && totalByProperty.get(d.observedPropertyDeterminandLabel) < 80000 );
   });
   sortByPropertyName = d3.groupSort(xScaleFix, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
   
@@ -271,9 +271,10 @@ function StackedBarChart(data, {
       Tooltip_Bars.style("opacity", 1)
     }
     var bar_mousemove = function(event, d) {
-      console.log(d.data[0]);
       Tooltip_Bars
       .html(descri.find(element => element.pollutant == d.data[0]).descri)
+      style("left", (event.x)/2 + "px")
+		  .style("top", (event.y)/2 + "px")
     }
     var bar_mouseleave = function(event, d) {
     Tooltip_Bars.style("opacity", 0)
