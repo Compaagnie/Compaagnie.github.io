@@ -7,7 +7,7 @@ const projection = d3.geoConicConformal()
 
 path.projection(projection);
 
-const svgMap = d3.select('#map').append("svg")
+const svgMap = d3.select('#allMap').append("svg")
   .attr("id", "svg")
   .attr("width", widthMap)
   .attr("height", heightMap);
@@ -22,7 +22,7 @@ let zoom = d3.zoom()
        svgMap.attr('transform', event.transform)
    });
  
-const container = d3.select("#map")	;
+const container = d3.select("#allMap")	;
 container.call(zoom);
 
 const deps = svgMap.append("g").classed("departments", true);
