@@ -10,10 +10,11 @@ path.projection(projection);
 const svgMap = d3.select('#map').append("svg")
   .attr("id", "svg")
   .attr("width", widthMap)
-  .attr("height", heightMap)
-  ;
+  .attr("height", heightMap);
 
-
+var content = document.getElementById('svg');
+var parent = content.parentNode;
+parent.insertBefore(content, parent.firstChild);
 	
 let zoom = d3.zoom()
    .scaleExtent([1, 3])
@@ -51,7 +52,7 @@ d3.csv("data/PosArea.csv", d => {
     lon: d.lon,
     lat: d.lat,
     area: d.cArea
-  }
+  };
 }).then(data => {
   // sort the data by body of water and longitude so we don't get empty lon/lat
   data = data.sort((a, b) => d3.ascending(a.idBW, b.idBW) || d3.ascending(a.lon, b.lon));
@@ -72,6 +73,8 @@ d3.csv("data/PosArea.csv", d => {
 
 // current sources selected on the map
 var map_selection = [];
+var color = "#a8dadc";
+var current_circle_colored = 1;
 
 // a function used to select a source (or multiple sources) 
 // and filter the bar chart by those sources
@@ -79,12 +82,16 @@ function map_mouseclick(event, d)
 {	
 	// add to array or change array depending on click
 	if(event.shiftKey){
+    const newRandomColor = d3.schemeTableau10[current_circle_colored++%d3.schemeTableau10.length];
+    color = newRandomColor;
     if (!map_selection.includes(d.idBW)){  
       map_selection.push(d.idBW);
       addFocusLegend(d);
     }
   } 
 	else {
+    color = "#a8dadc";
+    current_circle_colored = 1;
     map_selection = [d.idBW];
     document.getElementById("detailBarTooltip").replaceChildren();
     addFocusLegend(d);
@@ -120,7 +127,6 @@ function map_mouseclick(event, d)
 	
 
 	const new_sort_by_name = d3.groupSort(filtered_bars, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
-	set_bars_order(new_sort_by_name);
 	console.log("Filtered bars:", filtered_bars);
 
 	// detailBarChart = StackedBarChart(filtered_bars, 
@@ -153,6 +159,7 @@ function map_mouseclick(event, d)
 }
 
 
+
 var addFocusLegend = function(d){
   var bar_legend = d3.select("#detailBarTooltip")
     .append("div")
@@ -160,16 +167,17 @@ var addFocusLegend = function(d){
     .style("opacity", 1)
     .style("background-color", "white")
     .style("border", "solid")
+    .style("border-color",  color)
     .style("border-width", "2px")
     .style("border-radius", "5px")
-    .style("padding", "5px")
-		bar_legend.html(d.name + "<br>" + "area: " + d.area + "<br> long: " + d.lon + " lat:  " + d.lat)
+    .style("padding", "5px");
+  bar_legend.html(d.name + "<br>" + "area: " + d.area + "<br> long: " + d.lon + " lat:  " + d.lat);
 }
 
 
 // create a tooltip
 
-Tooltip = d3.select("#map")
+Tooltip = d3.select("#map-contain")
 .append("div")
 .attr("class", "tooltip")
 .style("opacity", 0)
@@ -177,23 +185,23 @@ Tooltip = d3.select("#map")
 .style("border", "solid")
 .style("border-width", "2px")
 .style("border-radius", "5px")
-.style("padding", "5px")
+.style("padding", "5px");
  
 // Three function that change the tooltip
 // when user hover / move / leave a cell
 function map_mouseover(event, d) 
 {
-	Tooltip.style("opacity", 1)
+	Tooltip.style("opacity", 1);
 }
 function map_mousemove(event, d) 
 {
 	Tooltip
 		.html(d.name + "<br>" + "area: " + d.area + "<br> long: " + d.lon + " lat:  " + d.lat)
 		.style("left", (event.x)/2 + "px")
-		.style("top", (event.y)/2 + "px")
+		.style("top", (event.y)/2 + "px");
 }
 function map_mouseleave(event, d) {
-	Tooltip.style("opacity", 0)
+	Tooltip.style("opacity", 0);
 }
 
 
