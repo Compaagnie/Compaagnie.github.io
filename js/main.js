@@ -126,10 +126,12 @@ function bar_mouseclick_general(event, polluant_name)
 	var map_filtered;
 
 	const color_alone = "#a8dadc";
-	const colorA = ((selected_polluants.length == 0) ? color_alone : "#f7fcb9");
-	const colorAinterB = ((selected_polluants.length == 0) ? color_alone : "#addd8e");
-	const colorB = ((selected_polluants.length == 0) ? color_alone : "#31a354");
+	const colorA = ((selected_polluants.length == 0) ? color_alone : "#ff0000");
+	const colorAinterB = ((selected_polluants.length == 0) ? color_alone : "#00ff00");
+	const colorB = ((selected_polluants.length == 0) ? color_alone : "#ffff00");
 	
+
+
 	var site_arrays = [];
 	// if no selection : default (all)
 	if(selected_polluants.length == 0) map_filtered = usableDataForMap;
@@ -141,35 +143,18 @@ function bar_mouseclick_general(event, polluant_name)
 		site_arrays = selected_polluants.map(v => idSite_eachPolluants.get(v));
 		
 		// create intersection of array(s) if 2 are present in selection
-		var inter_sites = site_arrays[0];
-		if(site_arrays.length > 1) inter_sites = inter_sites.filter(v => (site_arrays[1]).includes(v))
+		// var inter_sites = site_arrays[0];
+		// if(site_arrays.length > 1) inter_sites = inter_sites.filter(v => (site_arrays[1]).includes(v))
 		
-		// const all_sites = ([]).concat(...all_sites_arrays);
+		const union_sites = ([]).concat(...site_arrays);
 	
 		// filter the map data to gather only the corresponding BW
 		var map_filtered = usableDataForMap.filter(
 			function(d)
 			{
-				return inter_sites.find(m => m == d.idSite);
+				return union_sites.find(m => m == d.idSite);
 			}
 		);
-	}
-
-	for(var d of map_filtered)
-	{
-		if(site_arrays.length < 2)
-		{
-			d.color = color_alone;
-		}
-		else
-		{
-			const in_a = site_arrays[0].includes(d.idSite);
-			const in_b = site_arrays[1].includes(d.idSite);
-			
-			if(in_a && ! in_b) d.color = colorA;
-			else if(in_b && !in_a) d.color = colorB;
-			else d.color = colorAinterB;
-		}
 	}
 
 	// function to have a liner size for the radius of the circles
@@ -177,8 +162,37 @@ function bar_mouseclick_general(event, polluant_name)
       .domain([0,50])  // What's in the data
       .range([1, 15]);
 
+	// remove legend if exists
+	d3.select("#PropertySelection").node().replaceChildren();
 
-	// addSelectPropertyTooltip({name:, color:})
+	// update legend
+	if(site_arrays.length == 1) 
+	{
+		addSelectPropertyTooltip({ name: selected_polluants, color: color_alone})
+	}
+	else if(site_arrays.length == 2)
+	{
+		addSelectPropertyTooltip({ name: selected_polluants[0], color: colorA})
+		addSelectPropertyTooltip({ name: "Both polluants", color: colorAinterB})
+		addSelectPropertyTooltip({ name: selected_polluants[1], color: colorB})
+	} 
+
+	function get_datum_color(d)
+	{ 
+		if(site_arrays.length < 2)
+		{
+			return color_alone;
+		}
+		else
+		{
+			const in_a = (site_arrays[0]).includes(d.idSite);
+			const in_b = (site_arrays[1]).includes(d.idSite);
+			
+			if(in_a && ! in_b) return colorA;
+			else if(in_b && !in_a) return colorB;
+			else return colorAinterB;
+		}
+	}
 
 	// create circles for each BW corresponding to its area
 	circles.selectAll("circle")
@@ -195,7 +209,7 @@ function bar_mouseclick_general(event, polluant_name)
 					.attr("stroke", "#219ebc")
 					.attr("fill-opacity", .4)
 					// .attr("fill", "#a8dadc")
-					.attr("fill", function(d){ console.log("color", d.color); return d.color;})
+					.attr("fill", get_datum_color)
 					.on("mouseover", map_mouseover)
 					.on("mousemove", map_mousemove)
 					.on("mouseleave", map_mouseleave)
@@ -205,7 +219,7 @@ function bar_mouseclick_general(event, polluant_name)
 			,
 			update => 
 			{
-				//console.log(update);
+				update.attr("fill", get_datum_color)
 			}
 			,
 			exit =>
