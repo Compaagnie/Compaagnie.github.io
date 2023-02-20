@@ -97,9 +97,9 @@ var createChart = function(){
 }
 
 var selected_polluants = new Set();
-var current_circle_color = 0;
+var current_circle_color = 0; 
 var site_ids = [];
-
+var color = "#a8dadc";
 // function used to filter on polluant for the map
 function bar_mouseclick(event, d)
 {
@@ -146,10 +146,10 @@ function bar_mouseclick(event, d)
 
 	
 	// const newRandomColor = "#" + Math.floor(Math.random()*16777215).toString(16);
-	const newRandomColor = d3.schemeTableau10[current_circle_color++%d3.schemeTableau10.length]
+	const newRandomColor = d3.schemeTableau10[current_circle_color++%d3.schemeTableau10.length];
 	const bothRandomColor = "#" + Math.floor(Math.random()*16777215).toString(16);
 	
-	var color = "#a8dadc";
+	
 	if(event.shiftKey) color = newRandomColor;
 
 	// create circles for each BW corresponding to its area
@@ -256,6 +256,8 @@ function detail_bar_mouseclick(event, d)
 	// const newRandomColor = "#" + Math.floor(Math.random()*16777215).toString(16);
 	const newRandomColor = d3.schemeTableau10[current_circle_color++%d3.schemeTableau10.length]
 	const bothRandomColor = "#" + Math.floor(Math.random()*16777215).toString(16);
+  console.log("chart");
+  console.log(current_circle_color);
 	
 	var color = "#a8dadc";
 	if(event.shiftKey) color = newRandomColor;

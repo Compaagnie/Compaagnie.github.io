@@ -73,6 +73,8 @@ d3.csv("data/PosArea.csv", d => {
 
 // current sources selected on the map
 var map_selection = [];
+var color = "#a8dadc";
+var current_circle_colored = 1;
 
 // a function used to select a source (or multiple sources) 
 // and filter the bar chart by those sources
@@ -80,12 +82,16 @@ function map_mouseclick(event, d)
 {	
 	// add to array or change array depending on click
 	if(event.shiftKey){
+    const newRandomColor = d3.schemeTableau10[current_circle_colored++%d3.schemeTableau10.length];
+    color = newRandomColor;
     if (!map_selection.includes(d.idBW)){  
       map_selection.push(d.idBW);
       addFocusLegend(d);
     }
   } 
 	else {
+    color = "#a8dadc";
+    current_circle_colored = 1;
     map_selection = [d.idBW];
     document.getElementById("detailBarTooltip").replaceChildren();
     addFocusLegend(d);
@@ -153,6 +159,7 @@ function map_mouseclick(event, d)
 }
 
 
+
 var addFocusLegend = function(d){
   var bar_legend = d3.select("#detailBarTooltip")
     .append("div")
@@ -160,6 +167,7 @@ var addFocusLegend = function(d){
     .style("opacity", 1)
     .style("background-color", "white")
     .style("border", "solid")
+    .style("border-color",  color)
     .style("border-width", "2px")
     .style("border-radius", "5px")
     .style("padding", "5px");
