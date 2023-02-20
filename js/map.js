@@ -17,7 +17,7 @@ var parent = content.parentNode;
 parent.insertBefore(content, parent.firstChild);
 	
 let zoom = d3.zoom()
-   .scaleExtent([1, 3])
+   .scaleExtent([1, 10])
    .on('zoom', event => {
        svgMap.attr('transform', event.transform)
    });
