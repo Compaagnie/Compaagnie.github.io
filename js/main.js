@@ -100,7 +100,7 @@ var selected_polluants = [];
 var current_circle_color = 0;
 
 
-function bar_mouseclick_general(polluant_name)
+function bar_mouseclick_general(event, polluant_name)
 {
 	// manage selection
 	const idx = selected_polluants.indexOf(polluant_name);
@@ -199,12 +199,12 @@ function bar_mouseclick_general(polluant_name)
 // function used to filter on polluant for the general map
 function bar_mouseclick(event, d)
 {
-	bar_mouseclick_general(d.data[0])
+	bar_mouseclick_general(event, d.data[0])
 }
 // function used to filter on polluant for the detailled map
 function detail_bar_mouseclick(event, d)
 {
-	bar_mouseclick_general(d);
+	bar_mouseclick_general(event, d);
 }
 
 // create a tooltip
