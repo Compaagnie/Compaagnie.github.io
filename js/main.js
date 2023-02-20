@@ -476,7 +476,6 @@ function GroupedBarChart(data, {
     const T = title;
     title = i => T(O[i], i, data);
   }
-
   const svg = d3.create("svg")
       .attr("width", width)
       .attr("height", height)
@@ -497,6 +496,7 @@ function GroupedBarChart(data, {
           .attr("text-anchor", "start")
           .text(yLabel));
   console.log(I);
+
   const bar = svg.append("g")
     .selectAll("rect")
     .data(X)
@@ -512,7 +512,7 @@ function GroupedBarChart(data, {
     
   bar.on("click", detail_bar_mouseclick);
   if (title) bar.append("title")
-    .text(title);
+    .text((v,i) => title(i));
       
   const xGroup = svg.append("g")
   .style("font-size", "1em")
