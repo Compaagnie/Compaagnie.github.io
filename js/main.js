@@ -125,6 +125,12 @@ function bar_mouseclick_general(event, polluant_name)
 
 	var map_filtered;
 
+	const color_alone = "#a8dadc";
+	const colorA = ((selected_polluants.length == 0) ? color_alone : "#f7fcb9");
+	const colorAinterB = ((selected_polluants.length == 0) ? color_alone : "#addd8e");
+	const colorB = ((selected_polluants.length == 0) ? color_alone : "#31a354");
+	
+	var site_arrays = [];
 	// if no selection : default (all)
 	if(selected_polluants.length == 0) map_filtered = usableDataForMap;
 	else // only selection
@@ -132,7 +138,7 @@ function bar_mouseclick_general(event, polluant_name)
 		console.log(selected_polluants);
 
 		// get site arrays corresponding to "polluants"
-		const site_arrays = selected_polluants.map(v => idSite_eachPolluants.get(v));
+		site_arrays = selected_polluants.map(v => idSite_eachPolluants.get(v));
 		
 		// create intersection of array(s) if 2 are present in selection
 		var inter_sites = site_arrays[0];
@@ -149,17 +155,30 @@ function bar_mouseclick_general(event, polluant_name)
 		);
 	}
 
+	for(var d of map_filtered)
+	{
+		if(site_arrays.length < 2)
+		{
+			d.color = color_alone;
+		}
+		else
+		{
+			const in_a = site_arrays[0].includes(d.idSite);
+			const in_b = site_arrays[1].includes(d.idSite);
+			
+			if(in_a && ! in_b) d.color = colorA;
+			else if(in_b && !in_a) d.color = colorB;
+			else d.color = colorAinterB;
+		}
+	}
+
 	// function to have a liner size for the radius of the circles
 	var size = d3.scaleLinear()
       .domain([0,50])  // What's in the data
       .range([1, 15]);
 
-	const color_alone = "#a8dadc";
-	const colorA = ((selected_polluants.length == 0) ? color_alone : "#f7fcb9");
-	const colorB = ((selected_polluants.length == 0) ? color_alone : "#addd8e");
-	const colorC = ((selected_polluants.length == 0) ? color_alone : "#31a354");
 
-	
+	// addSelectPropertyTooltip({name:, color:})
 
 	// create circles for each BW corresponding to its area
 	circles.selectAll("circle")
@@ -175,7 +194,8 @@ function bar_mouseclick_general(event, polluant_name)
 					.attr("stroke-width", 1)
 					.attr("stroke", "#219ebc")
 					.attr("fill-opacity", .4)
-					.attr("fill", "#a8dadc")
+					// .attr("fill", "#a8dadc")
+					.attr("fill", function(d){ console.log("color", d.color); return d.color;})
 					.on("mouseover", map_mouseover)
 					.on("mousemove", map_mousemove)
 					.on("mouseleave", map_mouseleave)
