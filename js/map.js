@@ -52,7 +52,7 @@ d3.csv("data/PosArea.csv", d => {
     lon: d.lon,
     lat: d.lat,
     area: d.cArea
-  }
+  };
 }).then(data => {
   // sort the data by body of water and longitude so we don't get empty lon/lat
   data = data.sort((a, b) => d3.ascending(a.idBW, b.idBW) || d3.ascending(a.lon, b.lon));
@@ -121,7 +121,6 @@ function map_mouseclick(event, d)
 	
 
 	const new_sort_by_name = d3.groupSort(filtered_bars, D => d3.sum(D, d => -d.resultMeanValue), d => d.observedPropertyDeterminandLabel);
-	set_bars_order(new_sort_by_name);
 	console.log("Filtered bars:", filtered_bars);
 
 	// detailBarChart = StackedBarChart(filtered_bars, 
@@ -163,8 +162,8 @@ var addFocusLegend = function(d){
     .style("border", "solid")
     .style("border-width", "2px")
     .style("border-radius", "5px")
-    .style("padding", "5px")
-		bar_legend.html(d.name + "<br>" + "area: " + d.area + "<br> long: " + d.lon + " lat:  " + d.lat)
+    .style("padding", "5px");
+  bar_legend.html(d.name + "<br>" + "area: " + d.area + "<br> long: " + d.lon + " lat:  " + d.lat);
 }
 
 
@@ -178,23 +177,23 @@ Tooltip = d3.select("#map-contain")
 .style("border", "solid")
 .style("border-width", "2px")
 .style("border-radius", "5px")
-.style("padding", "5px")
+.style("padding", "5px");
  
 // Three function that change the tooltip
 // when user hover / move / leave a cell
 function map_mouseover(event, d) 
 {
-	Tooltip.style("opacity", 1)
+	Tooltip.style("opacity", 1);
 }
 function map_mousemove(event, d) 
 {
 	Tooltip
 		.html(d.name + "<br>" + "area: " + d.area + "<br> long: " + d.lon + " lat:  " + d.lat)
 		.style("left", (event.x)/2 + "px")
-		.style("top", (event.y)/2 + "px")
+		.style("top", (event.y)/2 + "px");
 }
 function map_mouseleave(event, d) {
-	Tooltip.style("opacity", 0)
+	Tooltip.style("opacity", 0);
 }
 
 

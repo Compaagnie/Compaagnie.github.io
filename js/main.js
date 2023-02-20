@@ -52,11 +52,6 @@ var byWaterBodyIdentifier;
 var idSite_eachPolluants;
 var xScaleFix, sortByPropertyName;
 
-var detailBarChartOrder
-var set_bars_order = function(data){
-  detailBarChartOrder = d3.map(data, d => d);
-  detailBarChartOrder = detailBarChartOrder.reverse();
-}
 var overallBarChart;
 var detailBarChart;
 var Legend;
@@ -216,21 +211,20 @@ function bar_mouseclick(event, d)
 // function used to filter on polluant for the map
 function detail_bar_mouseclick(event, d)
 {
-  console.log(d);
 	// manage selection
-	if(selected_polluants.has(detailBarChartOrder[d])) // if already selected
+	if(selected_polluants.has(d)) // if already selected
 	{
 		// remove only this elem
-		if(event.shiftKey) selected_polluants.delete(detailBarChartOrder[d])
+		if(event.shiftKey) selected_polluants.delete(d)
 		// remove all elems
 		else selected_polluants = new Set();
 	}
 	else // if not selected
 	{
 		// add to selection
-		if(event.shiftKey) selected_polluants.add(detailBarChartOrder[d])
+		if(event.shiftKey) selected_polluants.add(d)
 		// se as selection
-		else selected_polluants = new Set([detailBarChartOrder[d]]);
+		else selected_polluants = new Set([d]);
 	}
 
 	// get all sites corresponding to all "polluants"
@@ -267,7 +261,7 @@ function detail_bar_mouseclick(event, d)
 	if(event.shiftKey) color = newRandomColor;
 
   // il faudrait l'ajouter correctement, peut être dans le join/update/exit
-  addSelectPropertyTooltip({name:detailBarChartOrder[d],color:color});
+  addSelectPropertyTooltip({name:d,color:color});
 
 	// create circles for each BW corresponding to its area
 	circles.selectAll("circle")
@@ -385,8 +379,11 @@ var bar_mouseleave = function(event, d) {
   Tooltip_Bars.style("opacity", 0);
 }
 var detail_bar_mousemove = function(event, d) {
+  console.log(d);
+  console.log(d);
+
   Tooltip_Bars
-  .html(descri.find(element => element.pollutant == detailBarChartOrder[d]).descri)
+  .html(descri.find(element => element.pollutant == d).descri)
   .style("left", (event.x)/2 + "px")
   .style("top", (event.y)/2 + "px");
 }
@@ -487,7 +484,8 @@ function StackedBarChart(data, {
             .attr("fill", "currentColor")
             .attr("text-anchor", "start")
             .text(yLabel))
-  
+    
+    console.log(series);
     const bar = svg.append("g")
 		.classed("series", true)
     .selectAll("g")
@@ -603,16 +601,16 @@ function GroupedBarChart(data, {
           .attr("fill", "currentColor")
           .attr("text-anchor", "start")
           .text(yLabel));
-
+  console.log(I);
   const bar = svg.append("g")
     .selectAll("rect")
-    .data(I)
+    .data(X)
     .join("rect")
-      .attr("x", i => xScale(X[i]) + xzScale(Z[i]))
-      .attr("y", i => yScale(Y[i]))
+      .attr("x", (v,i) => xScale(X[i]) + xzScale(Z[i]))
+      .attr("y", (v,i) => yScale(Y[i]))
       .attr("width", xzScale.bandwidth())
-      .attr("height", i => yScale(0) - yScale(Y[i]))
-      .attr("fill", i => zScale(Z[i]))
+      .attr("height", (v,i) => yScale(0) - yScale(Y[i]))
+      .attr("fill", (v,i) => zScale(Z[i]))
     .on("mouseover", bar_mouseover)
     .on("mousemove", detail_bar_mousemove)
     .on("mouseleave", bar_mouseleave);
